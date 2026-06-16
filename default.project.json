@@ -46,7 +46,9 @@
         }
       }
     },
-
+    "StarterPack": {
+    "$path": "src/starterpack"
+    },
     "Lighting": {
       "$properties": {
         "Ambient": [0, 0, 0],
@@ -62,5 +64,6 @@
         "RespectFilteringEnabled": true
       }
     }
+    
   }
 }
