@@ -13,9 +13,8 @@ local SPAWN_RADIUS = 30       -- how far from players enemies spawn
 
 -- State
 local currentWave = 0
-while true do
-local waveActive = false
-end 
+local _waveActive = false
+
 -- Wait for the EnemyTemplate to exist in ServerStorage
 local enemyTemplate = ServerStorage:WaitForChild("EnemyTemplate", 10)
 if not enemyTemplate then
@@ -89,12 +88,12 @@ local function startWaveLoop()
 		repeat task.wait(1) until #Players:GetPlayers() > 0
 
 		currentWave += 1
-		waveActive = true
+		_waveActive = true
 		spawnWave(currentWave)
 
 		task.wait(20)
 		clearEnemies()
-		waveActive = false
+		_waveActive = false
 
 		print(string.format("[WaveManager] Wave %d over. Next wave in %d seconds.", currentWave, WAVE_PAUSE))
 		task.wait(WAVE_PAUSE)
