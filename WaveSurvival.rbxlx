@@ -1448,26 +1448,20 @@ zNLfaoZA///+//PAj5CH]]></BinaryString>
 			<Item class="LocalScript" referent="RBXFD98BE86F3CF451CA3AD2079FB539774">
 				<Properties>
 					<ProtectedString name="Source"><![CDATA[-- LaserGun LocalScript: Phase 3 - Client Side
--- Handles mouse click to shoot, draws laser beam visual, sends hit to server.
-
 local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
-local RunService = game:GetService("RunService")
 
 local tool = script.Parent
 local player = Players.LocalPlayer
 local mouse = player:GetMouse()
 local laserFired = ReplicatedStorage:WaitForChild("LaserFired")
 
--- CONFIG
-local COOLDOWN = 0.3        -- seconds between shots
-local BEAM_LIFETIME = 0.1   -- how long the laser beam visual lasts
+local COOLDOWN = 0.3
+local BEAM_LIFETIME = 0.1
 local LASER_COLOR = BrickColor.new("Bright red")
-
 local canShoot = true
 local equipped = false
 
--- Draw a laser beam from start to end position
 local function drawBeam(startPos: Vector3, endPos: Vector3)
 	local beamPart = Instance.new("Part")
 	beamPart.Anchored = true
@@ -1476,78 +1470,50 @@ local function drawBeam(startPos: Vector3, endPos: Vector3)
 	beamPart.BrickColor = LASER_COLOR
 	beamPart.Material = Enum.Material.Neon
 	beamPart.Name = "LaserBeam"
-
 	local distance = (endPos - startPos).Magnitude
 	beamPart.Size = Vector3.new(0.1, 0.1, distance)
 	beamPart.CFrame = CFrame.lookAt(startPos, endPos) * CFrame.new(0, 0, -distance / 2)
 	beamPart.Parent = workspace
-
-	-- Auto-remove after BEAM_LIFETIME
 	task.delay(BEAM_LIFETIME, function()
-		if beamPart and beamPart.Parent then
-			beamPart:Destroy()
-		end
+		if beamPart and beamPart.Parent then beamPart:Destroy() end
 	end)
 end
 
--- Shoot function
 local function shoot()
 	if not canShoot or not equipped then return end
 	local character = player.Character
 	if not character then return end
-	local hrp = character:FindFirstChild("HumanoidRootPart")
-	if not hrp then return end
-
 	canShoot = false
-
-	-- Raycast from camera through mouse position
 	local camera = workspace.CurrentCamera
 	local unitRay = camera:ScreenPointToRay(mouse.X, mouse.Y)
 	local rayOrigin = unitRay.Origin
 	local rayDir = unitRay.Direction * 500
-
 	local rayParams = RaycastParams.new()
 	rayParams.FilterDescendantsInstances = {character}
 	rayParams.FilterType = Enum.RaycastFilterType.Exclude
-
 	local result = workspace:Raycast(rayOrigin, rayDir, rayParams)
-
 	local hitPos = result and result.Position or (rayOrigin + rayDir)
 	local hitEnemy: Model? = nil
-
 	if result and result.Instance then
 		local parent = result.Instance.Parent
 		if parent and parent.Name == "Enemy" and parent:IsA("Model") then
 			hitEnemy = parent
 		end
 	end
-
-	-- Draw beam from muzzle to hit point
 	local handle = tool:FindFirstChild("Handle")
 	local muzzle = handle and handle:FindFirstChild("Muzzle")
-	local startPos = muzzle and muzzle.WorldPosition or hrp.Position
+	local startPos = muzzle and muzzle.WorldPosition or character:FindFirstChild("HumanoidRootPart").Position
 	drawBeam(startPos, hitPos)
-
-	-- Fire to server with the enemy model and hit position
-	if hitEnemy then
-		laserFired:FireServer(hitEnemy, hitPos)
-	end
-
-	-- Cooldown
-	task.delay(COOLDOWN, function()
-		canShoot = true
-	end)
+	if hitEnemy then laserFired:FireServer(hitEnemy, hitPos) end
+	task.delay(COOLDOWN, function() canShoot = true end)
 end
 
--- Listen for server broadcasting beam visuals from other players
 laserFired.OnClientEvent:Connect(function(shootingPlayer: Player, hitPosition: Vector3)
-	if shootingPlayer == player then return end -- we already drew our own
+	if shootingPlayer == player then return end
 	local char = shootingPlayer.Character
 	if not char then return end
 	local hrp = char:FindFirstChild("HumanoidRootPart")
-	if hrp then
-		drawBeam(hrp.Position, hitPosition)
-	end
+	if hrp then drawBeam(hrp.Position, hitPosition) end
 end)
 
 tool.Equipped:Connect(function()
@@ -1915,90 +1881,35 @@ end
 			<BinaryString name="Tags"></BinaryString>
 			<UniqueId name="UniqueId">6bf9652ea5737aa20a421a980000038e</UniqueId>
 		</Properties>
-		<Item class="Script" referent="RBX462F1BC032F740B08D524DAB1604B510">
+		<Item class="Folder" referent="RBX936B5A505DB14E79B51C14D011088A39">
 			<Properties>
-				<ProtectedString name="Source"><![CDATA[-- LaserGunServer: Phase 3 - Laser Gun (Server Side)
--- Receives LaserFired events from clients, validates hits, deals damage.
--- 2 hits kill an enemy (each hit deals 50 damage, enemies have 100 HP).
-
-local ReplicatedStorage = game:GetService("ReplicatedStorage")
-local Players = game:GetService("Players")
-
-local laserFired = ReplicatedStorage:WaitForChild("LaserFired")
-
--- Track hit counts per enemy so we can confirm 2-hit kills
-local hitCounts = {}
-
-local function onLaserFired(player: Player, enemyModel: Model, hitPosition: Vector3)
-	-- Sanity checks
-	if not player or not player.Character then return end
-	if not enemyModel or not enemyModel:IsA("Model") then return end
-	if enemyModel.Name ~= "Enemy" then return end
-	if not enemyModel.Parent then return end -- already destroyed
-
-	local humanoid = enemyModel:FindFirstChildOfClass("Humanoid")
-	if not humanoid or humanoid.Health <= 0 then return end
-
-	-- Distance sanity check (anti-cheat: must be within 500 studs)
-	local hrp = player.Character:FindFirstChild("HumanoidRootPart")
-	local enemyRoot = enemyModel.PrimaryPart
-	if hrp and enemyRoot then
-		local dist = (hrp.Position - enemyRoot.Position).Magnitude
-		if dist > 500 then
-			warn(string.format("[LaserGunServer] Suspicious shot from %s — distance %.1f", player.Name, dist))
-			return
-		end
-	end
-
-	-- Deal damage
-	humanoid:TakeDamage(50)
-	print(string.format("[LaserGunServer] %s hit enemy — HP now %.0f", player.Name, humanoid.Health))
-
-	-- Fire back to all clients to show the laser beam visual
-	laserFired:FireAllClients(player, hitPosition)
-end
-
-laserFired.OnServerEvent:Connect(onLaserFired)
-
-print("[LaserGunServer] Loaded — listening for laser shots.")
-]]></ProtectedString>
-				<bool name="Disabled">false</bool>
-				<Content name="LinkedSource"><null></null></Content>
-				<token name="RunContext">0</token>
-				<string name="ScriptGuid">{D49D830E-3F01-4D0A-B588-3A489DE3762A}</string>
 				<BinaryString name="AttributesSerialize"></BinaryString>
 				<SecurityCapabilities name="Capabilities">0</SecurityCapabilities>
 				<bool name="DefinesCapabilities">false</bool>
 				<UniqueId name="HistoryId">00000000000000000000000000000000</UniqueId>
-				<string name="Name">LaserGunServer</string>
+				<string name="Name">Server</string>
 				<int64 name="SourceAssetId">-1</int64>
 				<BinaryString name="Tags"></BinaryString>
-				<UniqueId name="UniqueId">0e108733dfbced4a0a43145d00001724</UniqueId>
+				<UniqueId name="UniqueId">0e108733dfbced4a0a43145d000025c0</UniqueId>
 			</Properties>
-		</Item>
-		<Item class="Script" referent="RBX6BC324447FA04617A960BC5E75970BEC">
-			<Properties>
-				<ProtectedString name="Source"><![CDATA[-- WaveManager: Phase 1 + 4 - Enemy Spawning & Wave Progression
--- Spawns enemies in rings around players, waves escalate, short pause between waves.
-
+			<Item class="Script" referent="RBX813CF85AEBCC43E2B8AFF2667A64B99E">
+				<Properties>
+					<ProtectedString name="Source"><![CDATA[-- WaveManager: Phase 1 + 4 - Enemy Spawning & Wave Progression
 local ServerStorage = game:GetService("ServerStorage")
 local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 
--- CONFIG
-local WAVE_PAUSE = 5           -- seconds between waves
-local BASE_ENEMIES = 5         -- enemies on wave 1
-local ENEMIES_PER_WAVE = 3     -- extra enemies added each wave
-local SPAWN_RADIUS = 30        -- how far from players enemies spawn
-local WAVE_CLEAR_TIMEOUT = 60  -- max seconds to wait for all enemies to die before forcing next wave
+local WAVE_PAUSE = 5
+local BASE_ENEMIES = 5
+local ENEMIES_PER_WAVE = 3
+local SPAWN_RADIUS = 30
+local WAVE_CLEAR_TIMEOUT = 60
 
--- State
 local currentWave = 0
 local waveActive = false
 local activeEnemies = 0
-local waveCleared = Instance.new("BindableEvent") -- fires when all enemies are dead
+local waveCleared = Instance.new("BindableEvent")
 
--- Notify other scripts about wave state
 local waveInfoEvent = ReplicatedStorage:FindFirstChild("WaveInfo")
 if not waveInfoEvent then
 	waveInfoEvent = Instance.new("RemoteEvent")
@@ -2006,20 +1917,19 @@ if not waveInfoEvent then
 	waveInfoEvent.Parent = ReplicatedStorage
 end
 
--- Broadcast wave number to all clients (for HUD in Phase 5)
 local function broadcastWave(waveNumber: number)
 	waveInfoEvent:FireAllClients("Wave", waveNumber)
 end
 
--- Get a random spawn position around a center point
 local function getSpawnPosition(center: Vector3): Vector3
 	local angle = math.random() * 2 * math.pi
-	local x = center.X + math.cos(angle) * SPAWN_RADIUS
-	local z = center.Z + math.sin(angle) * SPAWN_RADIUS
-	return Vector3.new(x, center.Y + 5, z)
+	return Vector3.new(
+		center.X + math.cos(angle) * SPAWN_RADIUS,
+		center.Y + 5,
+		center.Z + math.sin(angle) * SPAWN_RADIUS
+	)
 end
 
--- Pick a random living player's position (or map center if none)
 local function getRandomPlayerPosition(): Vector3
 	local positions = {}
 	for _, player in ipairs(Players:GetPlayers()) do
@@ -2027,38 +1937,19 @@ local function getRandomPlayerPosition(): Vector3
 			table.insert(positions, player.Character.HumanoidRootPart.Position)
 		end
 	end
-	if #positions == 0 then
-		return Vector3.new(0, 5, 0)
-	end
-	return positions[math.random(#positions)]
+	return #positions > 0 and positions[math.random(#positions)] or Vector3.new(0, 5, 0)
 end
 
--- Spawn a single enemy and track it
 local function spawnEnemy(spawnPos: Vector3)
 	local enemyTemplate = ServerStorage:FindFirstChild("EnemyTemplate")
-	if not enemyTemplate then
-		warn("[WaveManager] EnemyTemplate missing!")
-		return
-	end
-
+	if not enemyTemplate then warn("[WaveManager] EnemyTemplate missing!") return end
 	local enemy = enemyTemplate:Clone()
 	enemy.Name = "Enemy"
 	enemy.Parent = workspace
-
 	if enemy.PrimaryPart then
 		enemy:SetPrimaryPartCFrame(CFrame.new(spawnPos))
-	else
-		for _, part in ipairs(enemy:GetDescendants()) do
-			if part:IsA("BasePart") then
-				part.Position = spawnPos
-				break
-			end
-		end
 	end
-
 	activeEnemies += 1
-
-	-- Track when this enemy dies
 	local humanoid = enemy:FindFirstChildOfClass("Humanoid")
 	if humanoid then
 		humanoid.Died:Connect(function()
@@ -2070,36 +1961,27 @@ local function spawnEnemy(spawnPos: Vector3)
 	end
 end
 
--- Spawn all enemies for a wave
 local function spawnWave(waveNumber: number)
 	local count = BASE_ENEMIES + (waveNumber - 1) * ENEMIES_PER_WAVE
-	print(string.format("[WaveManager] Wave %d starting — spawning %d enemies", waveNumber, count))
+	print(string.format("[WaveManager] Wave %d — spawning %d enemies", waveNumber, count))
 	activeEnemies = 0
-	for i = 1, count do
-		local center = getRandomPlayerPosition()
-		local pos = getSpawnPosition(center)
-		spawnEnemy(pos)
+	for _ = 1, count do
+		spawnEnemy(getSpawnPosition(getRandomPlayerPosition()))
 		task.wait(0.2)
 	end
 end
 
--- Clean up any remaining enemies
 local function clearEnemies()
 	for _, obj in ipairs(workspace:GetChildren()) do
-		if obj.Name == "Enemy" then
-			obj:Destroy()
-		end
+		if obj.Name == "Enemy" then obj:Destroy() end
 	end
 	activeEnemies = 0
 end
 
--- Wait for all enemies to die OR timeout
 local function waitForWaveClear()
 	if activeEnemies <= 0 then return end
 	local cleared = false
-	local conn = waveCleared.Event:Connect(function()
-		cleared = true
-	end)
+	local conn = waveCleared.Event:Connect(function() cleared = true end)
 	local elapsed = 0
 	while not cleared and elapsed < WAVE_CLEAR_TIMEOUT do
 		task.wait(1)
@@ -2107,11 +1989,10 @@ local function waitForWaveClear()
 	end
 	conn:Disconnect()
 	if not cleared then
-		warn(string.format("[WaveManager] Wave %d timed out — forcing next wave", currentWave))
+		warn(string.format("[WaveManager] Wave %d timed out", currentWave))
 	end
 end
 
--- Count living players
 local function livingPlayerCount(): number
 	local count = 0
 	for _, player in ipairs(Players:GetPlayers()) do
@@ -2125,83 +2006,61 @@ local function livingPlayerCount(): number
 	return count
 end
 
--- Main wave loop
-local function startWaveLoop()
+task.delay(3, function()
 	while true do
-		-- Wait for at least one living player
 		repeat task.wait(1) until livingPlayerCount() > 0
-
 		currentWave += 1
 		waveActive = true
-
 		print(string.format("[WaveManager] === WAVE %d ===", currentWave))
 		broadcastWave(currentWave)
 		spawnWave(currentWave)
-
-		-- Wait until all enemies are killed (or timeout)
 		waitForWaveClear()
 		waveActive = false
-		clearEnemies() -- clean up any stragglers
-
-		print(string.format("[WaveManager] Wave %d cleared! Next wave in %ds.", currentWave, WAVE_PAUSE))
-		broadcastWave(0) -- 0 = between waves signal for HUD
-
+		clearEnemies()
+		print(string.format("[WaveManager] Wave %d cleared! Next in %ds.", currentWave, WAVE_PAUSE))
+		broadcastWave(0)
 		task.wait(WAVE_PAUSE)
 	end
-end
-
--- Kick off
-task.delay(3, function()
-	startWaveLoop()
 end)
 
-print("[WaveManager] Loaded — waiting 3 seconds before first wave.")
+print("[WaveManager] Loaded.")
 ]]></ProtectedString>
-				<bool name="Disabled">false</bool>
-				<Content name="LinkedSource"><null></null></Content>
-				<token name="RunContext">0</token>
-				<string name="ScriptGuid">{1F2DE754-2410-4ACD-B5AC-46D2A9B0824A}</string>
-				<BinaryString name="AttributesSerialize"></BinaryString>
-				<SecurityCapabilities name="Capabilities">0</SecurityCapabilities>
-				<bool name="DefinesCapabilities">false</bool>
-				<UniqueId name="HistoryId">00000000000000000000000000000000</UniqueId>
-				<string name="Name">WaveManager</string>
-				<int64 name="SourceAssetId">-1</int64>
-				<BinaryString name="Tags"></BinaryString>
-				<UniqueId name="UniqueId">0e108733dfbced4a0a43145d00001982</UniqueId>
-			</Properties>
-		</Item>
-		<Item class="Script" referent="RBX9E116F017C7C4FF2BDE6C92F13C5187B">
-			<Properties>
-				<ProtectedString name="Source"><![CDATA[-- EnemyAI: Phase 2 - Chase & Explode
--- Enemies chase the nearest living player.
--- When they touch a player they explode, dealing damage.
-
+					<bool name="Disabled">false</bool>
+					<Content name="LinkedSource"><null></null></Content>
+					<token name="RunContext">0</token>
+					<string name="ScriptGuid">{283851E4-CFF2-4BAC-9543-521474EB7EFF}</string>
+					<BinaryString name="AttributesSerialize"></BinaryString>
+					<SecurityCapabilities name="Capabilities">0</SecurityCapabilities>
+					<bool name="DefinesCapabilities">false</bool>
+					<UniqueId name="HistoryId">00000000000000000000000000000000</UniqueId>
+					<string name="Name">WaveManager</string>
+					<int64 name="SourceAssetId">-1</int64>
+					<BinaryString name="Tags"></BinaryString>
+					<UniqueId name="UniqueId">0e108733dfbced4a0a43145d000025c1</UniqueId>
+				</Properties>
+			</Item>
+			<Item class="Script" referent="RBXF8363EF413B4435FB48EC649D378B0B7">
+				<Properties>
+					<ProtectedString name="Source"><![CDATA[-- EnemyAI: Phase 2 - Chase & Explode
 local Players = game:GetService("Players")
 local PathfindingService = game:GetService("PathfindingService")
 
--- CONFIG
 local DAMAGE = 50
 local EXPLOSION_RADIUS = 8
 local CHASE_INTERVAL = 0.5
 local DETECT_RANGE = 200
 
 local function getNearestPlayer(fromPos: Vector3)
-	local nearest = nil
-	local nearestDist = DETECT_RANGE
+	local nearest, nearestDist = nil, DETECT_RANGE
 	for _, player in ipairs(Players:GetPlayers()) do
 		local char = player.Character
 		if not char then continue end
 		local hrp = char:FindFirstChild("HumanoidRootPart")
 		local hum = char:FindFirstChildOfClass("Humanoid")
-		if not hrp or not hum then continue end
-		if hum.Health <= 0 then continue end
+		if not hrp or not hum or hum.Health <= 0 then continue end
 		if char:FindFirstChild("Spectator") then continue end
 		local dist = (hrp.Position - fromPos).Magnitude
-		if dist < nearestDist then
-			nearest = player
-			nearestDist = dist
-		end
+		if dist < nearestDist then nearest = player nearestDist = dist end
 	end
 	return nearest
 end
@@ -2256,20 +2115,12 @@ local function startChase(enemy: Model)
 			if target and target.Character then
 				local targetHRP = target.Character:FindFirstChild("HumanoidRootPart")
 				if targetHRP then
-					local path = PathfindingService:CreatePath({
-						AgentHeight = 5,
-						AgentRadius = 2,
-						AgentCanJump = true,
-					})
-					local ok = pcall(function()
-						path:ComputeAsync(root.Position, targetHRP.Position)
-					end)
+					local path = PathfindingService:CreatePath({ AgentHeight = 5, AgentRadius = 2, AgentCanJump = true })
+					local ok = pcall(function() path:ComputeAsync(root.Position, targetHRP.Position) end)
 					if ok and path.Status == Enum.PathStatus.Success then
 						for _, wp in ipairs(path:GetWaypoints()) do
 							if exploded or not enemy.Parent then break end
-							if wp.Action == Enum.PathWaypointAction.Jump then
-								humanoid.Jump = true
-							end
+							if wp.Action == Enum.PathWaypointAction.Jump then humanoid.Jump = true end
 							humanoid:MoveTo(wp.Position)
 							humanoid.MoveToFinished:Wait()
 						end
@@ -2290,21 +2141,67 @@ workspace.ChildAdded:Connect(function(child)
 	end
 end)
 
-print("[EnemyAI] Loaded — watching for enemies.")
+print("[EnemyAI] Loaded.")
 ]]></ProtectedString>
-				<bool name="Disabled">false</bool>
-				<Content name="LinkedSource"><null></null></Content>
-				<token name="RunContext">0</token>
-				<string name="ScriptGuid">{8D92AA8E-5D6E-4FEC-BD12-C8F26F216FD5}</string>
-				<BinaryString name="AttributesSerialize"></BinaryString>
-				<SecurityCapabilities name="Capabilities">0</SecurityCapabilities>
-				<bool name="DefinesCapabilities">false</bool>
-				<UniqueId name="HistoryId">00000000000000000000000000000000</UniqueId>
-				<string name="Name">EnemyAI</string>
-				<int64 name="SourceAssetId">-1</int64>
-				<BinaryString name="Tags"></BinaryString>
-				<UniqueId name="UniqueId">0e108733dfbced4a0a43145d00001984</UniqueId>
-			</Properties>
+					<bool name="Disabled">false</bool>
+					<Content name="LinkedSource"><null></null></Content>
+					<token name="RunContext">0</token>
+					<string name="ScriptGuid">{0F9D6C71-1900-462C-9E35-4F2E90883F32}</string>
+					<BinaryString name="AttributesSerialize"></BinaryString>
+					<SecurityCapabilities name="Capabilities">0</SecurityCapabilities>
+					<bool name="DefinesCapabilities">false</bool>
+					<UniqueId name="HistoryId">00000000000000000000000000000000</UniqueId>
+					<string name="Name">EnemyAI</string>
+					<int64 name="SourceAssetId">-1</int64>
+					<BinaryString name="Tags"></BinaryString>
+					<UniqueId name="UniqueId">0e108733dfbced4a0a43145d000025c3</UniqueId>
+				</Properties>
+			</Item>
+			<Item class="Script" referent="RBXB3186F94D03446669871FCAAEF874496">
+				<Properties>
+					<ProtectedString name="Source"><![CDATA[-- LaserGunServer: Phase 3 - Server Side
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local Players = game:GetService("Players")
+
+local laserFired = ReplicatedStorage:WaitForChild("LaserFired")
+
+local function onLaserFired(player: Player, enemyModel: Model, hitPosition: Vector3)
+	if not player or not player.Character then return end
+	if not enemyModel or not enemyModel:IsA("Model") then return end
+	if enemyModel.Name ~= "Enemy" then return end
+	if not enemyModel.Parent then return end
+	local humanoid = enemyModel:FindFirstChildOfClass("Humanoid")
+	if not humanoid or humanoid.Health <= 0 then return end
+	local hrp = player.Character:FindFirstChild("HumanoidRootPart")
+	local enemyRoot = enemyModel.PrimaryPart
+	if hrp and enemyRoot then
+		if (hrp.Position - enemyRoot.Position).Magnitude > 500 then
+			warn("[LaserGunServer] Suspicious shot from " .. player.Name)
+			return
+		end
+	end
+	humanoid:TakeDamage(50)
+	print(string.format("[LaserGunServer] %s hit enemy — HP: %.0f", player.Name, humanoid.Health))
+	laserFired:FireAllClients(player, hitPosition)
+end
+
+laserFired.OnServerEvent:Connect(onLaserFired)
+print("[LaserGunServer] Loaded.")
+]]></ProtectedString>
+					<bool name="Disabled">false</bool>
+					<Content name="LinkedSource"><null></null></Content>
+					<token name="RunContext">0</token>
+					<string name="ScriptGuid">{EA63A702-4CF9-4247-B00E-CDB6D3C3BA87}</string>
+					<BinaryString name="AttributesSerialize"></BinaryString>
+					<SecurityCapabilities name="Capabilities">0</SecurityCapabilities>
+					<bool name="DefinesCapabilities">false</bool>
+					<UniqueId name="HistoryId">00000000000000000000000000000000</UniqueId>
+					<string name="Name">LaserGunServer</string>
+					<int64 name="SourceAssetId">-1</int64>
+					<BinaryString name="Tags"></BinaryString>
+					<UniqueId name="UniqueId">0e108733dfbced4a0a43145d000025c5</UniqueId>
+				</Properties>
+			</Item>
 		</Item>
 	</Item>
 	<Item class="ServerStorage" referent="RBXC5BE9D1E559D424A8BD798B5D3E4C65A">
