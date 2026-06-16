@@ -1,0 +1,11 @@
+{
+    "languageMode": "nonstrict",
+    "globals": [
+        "game",
+        "workspace",
+        "script",
+        "task",
+        "warn",
+        "print"
+    ]
+}
