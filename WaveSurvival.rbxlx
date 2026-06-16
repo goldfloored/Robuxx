@@ -109,27 +109,27 @@
 		<Item class="Camera" referent="RBXAA22F8B3411843AFACFD394AD21A8B1C">
 			<Properties>
 				<CoordinateFrame name="CFrame">
-					<X>-20.0428696</X>
-					<Y>14.3699265</Y>
-					<Z>-18.2219086</Z>
-					<R00>-0.113588497</R00>
-					<R01>0.577392638</R01>
-					<R02>-0.808526695</R02>
-					<R10>7.4505806e-09</R10>
-					<R11>0.813793659</R11>
-					<R12>0.581153929</R12>
-					<R20>0.993527889</R20>
-					<R21>0.0660123974</R21>
-					<R22>-0.0924376026</R22>
+					<X>-39.8026543</X>
+					<Y>31.4465408</Y>
+					<Z>3.01614904</Z>
+					<R00>-0.989272356</R00>
+					<R01>0.0802030712</R01>
+					<R02>-0.122097</R02>
+					<R10>-7.4505806e-09</R10>
+					<R11>0.835806251</R11>
+					<R12>0.549024522</R12>
+					<R20>0.146082878</R20>
+					<R21>0.543134809</R21>
+					<R22>-0.826840043</R22>
 				</CoordinateFrame>
 				<Ref name="CameraSubject">null</Ref>
 				<token name="CameraType">0</token>
 				<float name="FieldOfView">70</float>
 				<token name="FieldOfViewMode">0</token>
 				<CoordinateFrame name="Focus">
-					<X>-18.4258137</X>
-					<Y>13.2076168</Y>
-					<Z>-18.0370331</Z>
+					<X>-39.5584602</X>
+					<Y>30.3484917</Y>
+					<Z>4.66982937</Z>
 					<R00>1</R00>
 					<R01>0</R01>
 					<R02>0</R02>
@@ -1259,6 +1259,323 @@ zNLfaoZA///+//PAj5CH]]></BinaryString>
 			<BinaryString name="Tags"></BinaryString>
 			<UniqueId name="UniqueId">6bf9652ea5737aa20a421a980000035f</UniqueId>
 		</Properties>
+		<Item class="Tool" referent="RBX74621BB01F9F44F389EB2D0EAC652DB5">
+			<Properties>
+				<bool name="CanBeDropped">true</bool>
+				<bool name="Enabled">true</bool>
+				<CoordinateFrame name="Grip">
+					<X>0</X>
+					<Y>0</Y>
+					<Z>0</Z>
+					<R00>1</R00>
+					<R01>0</R01>
+					<R02>0</R02>
+					<R10>0</R10>
+					<R11>1</R11>
+					<R12>0</R12>
+					<R20>0</R20>
+					<R21>0</R21>
+					<R22>1</R22>
+				</CoordinateFrame>
+				<bool name="ManualActivationOnly">false</bool>
+				<bool name="RequiresHandle">true</bool>
+				<string name="ToolTip">Laser Gun &#226;&#128;&#148; 2 shots kill</string>
+				<Content name="TextureId"><null></null></Content>
+				<token name="LevelOfDetail">0</token>
+				<CoordinateFrame name="ModelMeshCFrame">
+					<X>0</X>
+					<Y>0</Y>
+					<Z>0</Z>
+					<R00>1</R00>
+					<R01>0</R01>
+					<R02>0</R02>
+					<R10>0</R10>
+					<R11>1</R11>
+					<R12>0</R12>
+					<R20>0</R20>
+					<R21>0</R21>
+					<R22>1</R22>
+				</CoordinateFrame>
+				<SharedString name="ModelMeshData">yuZpQdnvvUBOTYh1jqZ2cA==</SharedString>
+				<Vector3 name="ModelMeshSize">
+					<X>0</X>
+					<Y>0</Y>
+					<Z>0</Z>
+				</Vector3>
+				<token name="ModelStreamingMode">0</token>
+				<bool name="NeedsPivotMigration">false</bool>
+				<Ref name="PrimaryPart">null</Ref>
+				<float name="ScaleFactor">1</float>
+				<SharedString name="SlimHash">yuZpQdnvvUBOTYh1jqZ2cA==</SharedString>
+				<OptionalCoordinateFrame name="WorldPivotData"></OptionalCoordinateFrame>
+				<BinaryString name="AttributesSerialize"></BinaryString>
+				<SecurityCapabilities name="Capabilities">0</SecurityCapabilities>
+				<bool name="DefinesCapabilities">false</bool>
+				<UniqueId name="HistoryId">00000000000000000000000000000000</UniqueId>
+				<string name="Name">LaserGun</string>
+				<int64 name="SourceAssetId">-1</int64>
+				<BinaryString name="Tags"></BinaryString>
+				<UniqueId name="UniqueId">0e108733dfbced4a0a43145d00001726</UniqueId>
+			</Properties>
+			<Item class="Part" referent="RBXE870E08968584392BE70B80A055202B8">
+				<Properties>
+					<token name="shape">1</token>
+					<token name="formFactorRaw">1</token>
+					<bool name="Anchored">false</bool>
+					<bool name="AudioCanCollide">true</bool>
+					<float name="BackParamA">-0.5</float>
+					<float name="BackParamB">0.5</float>
+					<token name="BackSurface">0</token>
+					<token name="BackSurfaceInput">0</token>
+					<float name="BottomParamA">-0.5</float>
+					<float name="BottomParamB">0.5</float>
+					<token name="BottomSurface">4</token>
+					<token name="BottomSurfaceInput">0</token>
+					<CoordinateFrame name="CFrame">
+						<X>0</X>
+						<Y>0</Y>
+						<Z>0</Z>
+						<R00>1</R00>
+						<R01>0</R01>
+						<R02>0</R02>
+						<R10>0</R10>
+						<R11>1</R11>
+						<R12>0</R12>
+						<R20>0</R20>
+						<R21>0</R21>
+						<R22>1</R22>
+					</CoordinateFrame>
+					<bool name="CanCollide">false</bool>
+					<bool name="CanQuery">true</bool>
+					<bool name="CanTouch">true</bool>
+					<bool name="CastShadow">true</bool>
+					<string name="CollisionGroup">Default</string>
+					<int name="CollisionGroupId">0</int>
+					<Color3uint8 name="Color3uint8">4279308561</Color3uint8>
+					<PhysicalProperties name="CustomPhysicalProperties">
+						<CustomPhysics>false</CustomPhysics>
+					</PhysicalProperties>
+					<bool name="EnableFluidForces">true</bool>
+					<float name="FrontParamA">-0.5</float>
+					<float name="FrontParamB">0.5</float>
+					<token name="FrontSurface">0</token>
+					<token name="FrontSurfaceInput">0</token>
+					<float name="LeftParamA">-0.5</float>
+					<float name="LeftParamB">0.5</float>
+					<token name="LeftSurface">0</token>
+					<token name="LeftSurfaceInput">0</token>
+					<bool name="Locked">false</bool>
+					<bool name="Massless">false</bool>
+					<token name="Material">272</token>
+					<string name="MaterialVariantSerialized"></string>
+					<CoordinateFrame name="PivotOffset">
+						<X>0</X>
+						<Y>0</Y>
+						<Z>0</Z>
+						<R00>1</R00>
+						<R01>0</R01>
+						<R02>0</R02>
+						<R10>0</R10>
+						<R11>1</R11>
+						<R12>0</R12>
+						<R20>0</R20>
+						<R21>0</R21>
+						<R22>1</R22>
+					</CoordinateFrame>
+					<float name="Reflectance">0</float>
+					<float name="RightParamA">-0.5</float>
+					<float name="RightParamB">0.5</float>
+					<token name="RightSurface">0</token>
+					<token name="RightSurfaceInput">0</token>
+					<int name="RootPriority">0</int>
+					<Vector3 name="RotVelocity">
+						<X>0</X>
+						<Y>0</Y>
+						<Z>0</Z>
+					</Vector3>
+					<float name="TopParamA">-0.5</float>
+					<float name="TopParamB">0.5</float>
+					<token name="TopSurface">3</token>
+					<token name="TopSurfaceInput">0</token>
+					<float name="Transparency">0</float>
+					<Vector3 name="Velocity">
+						<X>0</X>
+						<Y>0</Y>
+						<Z>0</Z>
+					</Vector3>
+					<Vector3 name="size">
+						<X>0.300000012</X>
+						<Y>0.300000012</Y>
+						<Z>1.5</Z>
+					</Vector3>
+					<BinaryString name="AttributesSerialize"></BinaryString>
+					<SecurityCapabilities name="Capabilities">0</SecurityCapabilities>
+					<bool name="DefinesCapabilities">false</bool>
+					<UniqueId name="HistoryId">00000000000000000000000000000000</UniqueId>
+					<string name="Name">Handle</string>
+					<int64 name="SourceAssetId">-1</int64>
+					<BinaryString name="Tags"></BinaryString>
+					<UniqueId name="UniqueId">0e108733dfbced4a0a43145d00001727</UniqueId>
+				</Properties>
+				<Item class="Attachment" referent="RBX56BA50AAB701424486FC9587D0F4B2FA">
+					<Properties>
+						<CoordinateFrame name="CFrame">
+							<X>0</X>
+							<Y>0</Y>
+							<Z>-0.75</Z>
+							<R00>1</R00>
+							<R01>0</R01>
+							<R02>0</R02>
+							<R10>0</R10>
+							<R11>1</R11>
+							<R12>0</R12>
+							<R20>0</R20>
+							<R21>0</R21>
+							<R22>1</R22>
+						</CoordinateFrame>
+						<bool name="Visible">false</bool>
+						<BinaryString name="AttributesSerialize"></BinaryString>
+						<SecurityCapabilities name="Capabilities">0</SecurityCapabilities>
+						<bool name="DefinesCapabilities">false</bool>
+						<UniqueId name="HistoryId">00000000000000000000000000000000</UniqueId>
+						<string name="Name">Muzzle</string>
+						<int64 name="SourceAssetId">-1</int64>
+						<BinaryString name="Tags"></BinaryString>
+						<UniqueId name="UniqueId">0e108733dfbced4a0a43145d00001728</UniqueId>
+					</Properties>
+				</Item>
+			</Item>
+			<Item class="LocalScript" referent="RBXFD98BE86F3CF451CA3AD2079FB539774">
+				<Properties>
+					<ProtectedString name="Source"><![CDATA[-- LaserGun LocalScript: Phase 3 - Client Side
+-- Handles mouse click to shoot, draws laser beam visual, sends hit to server.
+
+local Players = game:GetService("Players")
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local RunService = game:GetService("RunService")
+
+local tool = script.Parent
+local player = Players.LocalPlayer
+local mouse = player:GetMouse()
+local laserFired = ReplicatedStorage:WaitForChild("LaserFired")
+
+-- CONFIG
+local COOLDOWN = 0.3        -- seconds between shots
+local BEAM_LIFETIME = 0.1   -- how long the laser beam visual lasts
+local LASER_COLOR = BrickColor.new("Bright red")
+
+local canShoot = true
+local equipped = false
+
+-- Draw a laser beam from start to end position
+local function drawBeam(startPos: Vector3, endPos: Vector3)
+	local beamPart = Instance.new("Part")
+	beamPart.Anchored = true
+	beamPart.CanCollide = false
+	beamPart.CastShadow = false
+	beamPart.BrickColor = LASER_COLOR
+	beamPart.Material = Enum.Material.Neon
+	beamPart.Name = "LaserBeam"
+
+	local distance = (endPos - startPos).Magnitude
+	beamPart.Size = Vector3.new(0.1, 0.1, distance)
+	beamPart.CFrame = CFrame.lookAt(startPos, endPos) * CFrame.new(0, 0, -distance / 2)
+	beamPart.Parent = workspace
+
+	-- Auto-remove after BEAM_LIFETIME
+	task.delay(BEAM_LIFETIME, function()
+		if beamPart and beamPart.Parent then
+			beamPart:Destroy()
+		end
+	end)
+end
+
+-- Shoot function
+local function shoot()
+	if not canShoot or not equipped then return end
+	local character = player.Character
+	if not character then return end
+	local hrp = character:FindFirstChild("HumanoidRootPart")
+	if not hrp then return end
+
+	canShoot = false
+
+	-- Raycast from camera through mouse position
+	local camera = workspace.CurrentCamera
+	local unitRay = camera:ScreenPointToRay(mouse.X, mouse.Y)
+	local rayOrigin = unitRay.Origin
+	local rayDir = unitRay.Direction * 500
+
+	local rayParams = RaycastParams.new()
+	rayParams.FilterDescendantsInstances = {character}
+	rayParams.FilterType = Enum.RaycastFilterType.Exclude
+
+	local result = workspace:Raycast(rayOrigin, rayDir, rayParams)
+
+	local hitPos = result and result.Position or (rayOrigin + rayDir)
+	local hitEnemy: Model? = nil
+
+	if result and result.Instance then
+		local parent = result.Instance.Parent
+		if parent and parent.Name == "Enemy" and parent:IsA("Model") then
+			hitEnemy = parent
+		end
+	end
+
+	-- Draw beam from muzzle to hit point
+	local handle = tool:FindFirstChild("Handle")
+	local muzzle = handle and handle:FindFirstChild("Muzzle")
+	local startPos = muzzle and muzzle.WorldPosition or hrp.Position
+	drawBeam(startPos, hitPos)
+
+	-- Fire to server with the enemy model and hit position
+	if hitEnemy then
+		laserFired:FireServer(hitEnemy, hitPos)
+	end
+
+	-- Cooldown
+	task.delay(COOLDOWN, function()
+		canShoot = true
+	end)
+end
+
+-- Listen for server broadcasting beam visuals from other players
+laserFired.OnClientEvent:Connect(function(shootingPlayer: Player, hitPosition: Vector3)
+	if shootingPlayer == player then return end -- we already drew our own
+	local char = shootingPlayer.Character
+	if not char then return end
+	local hrp = char:FindFirstChild("HumanoidRootPart")
+	if hrp then
+		drawBeam(hrp.Position, hitPosition)
+	end
+end)
+
+tool.Equipped:Connect(function()
+	equipped = true
+	mouse.Button1Down:Connect(shoot)
+end)
+
+tool.Unequipped:Connect(function()
+	equipped = false
+end)
+
+print("[LaserGun] LocalScript loaded.")
+]]></ProtectedString>
+					<bool name="Disabled">false</bool>
+					<Content name="LinkedSource"><null></null></Content>
+					<token name="RunContext">0</token>
+					<string name="ScriptGuid">{8CAA54E7-4091-4E27-BE27-677B8E62D3E6}</string>
+					<BinaryString name="AttributesSerialize"></BinaryString>
+					<SecurityCapabilities name="Capabilities">0</SecurityCapabilities>
+					<bool name="DefinesCapabilities">false</bool>
+					<UniqueId name="HistoryId">00000000000000000000000000000000</UniqueId>
+					<string name="Name">LocalScript</string>
+					<int64 name="SourceAssetId">-1</int64>
+					<BinaryString name="Tags"></BinaryString>
+					<UniqueId name="UniqueId">0e108733dfbced4a0a43145d00001729</UniqueId>
+				</Properties>
+			</Item>
+		</Item>
 	</Item>
 	<Item class="StarterGui" referent="RBXFC313C5D084447E8B8664CE0992E53E3">
 		<Properties>
@@ -1573,6 +1890,18 @@ end
 				</Properties>
 			</Item>
 		</Item>
+		<Item class="RemoteEvent" referent="RBX8227229CC1434496B01EC826BD071719">
+			<Properties>
+				<BinaryString name="AttributesSerialize"></BinaryString>
+				<SecurityCapabilities name="Capabilities">0</SecurityCapabilities>
+				<bool name="DefinesCapabilities">false</bool>
+				<UniqueId name="HistoryId">00000000000000000000000000000000</UniqueId>
+				<string name="Name">LaserFired</string>
+				<int64 name="SourceAssetId">-1</int64>
+				<BinaryString name="Tags"></BinaryString>
+				<UniqueId name="UniqueId">0e108733dfbced4a0a43145d00001723</UniqueId>
+			</Properties>
+		</Item>
 	</Item>
 	<Item class="ServerScriptService" referent="RBX98FAB21C927A4DCE80373D7CC73E9E0E">
 		<Properties>
@@ -1586,49 +1915,103 @@ end
 			<BinaryString name="Tags"></BinaryString>
 			<UniqueId name="UniqueId">6bf9652ea5737aa20a421a980000038e</UniqueId>
 		</Properties>
-		<Item class="ModuleScript" referent="RBXA747270345884692B40D751001FFA600">
+		<Item class="Script" referent="RBX462F1BC032F740B08D524DAB1604B510">
 			<Properties>
+				<ProtectedString name="Source"><![CDATA[-- LaserGunServer: Phase 3 - Laser Gun (Server Side)
+-- Receives LaserFired events from clients, validates hits, deals damage.
+-- 2 hits kill an enemy (each hit deals 50 damage, enemies have 100 HP).
+
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local Players = game:GetService("Players")
+
+local laserFired = ReplicatedStorage:WaitForChild("LaserFired")
+
+-- Track hit counts per enemy so we can confirm 2-hit kills
+local hitCounts = {}
+
+local function onLaserFired(player: Player, enemyModel: Model, hitPosition: Vector3)
+	-- Sanity checks
+	if not player or not player.Character then return end
+	if not enemyModel or not enemyModel:IsA("Model") then return end
+	if enemyModel.Name ~= "Enemy" then return end
+	if not enemyModel.Parent then return end -- already destroyed
+
+	local humanoid = enemyModel:FindFirstChildOfClass("Humanoid")
+	if not humanoid or humanoid.Health <= 0 then return end
+
+	-- Distance sanity check (anti-cheat: must be within 500 studs)
+	local hrp = player.Character:FindFirstChild("HumanoidRootPart")
+	local enemyRoot = enemyModel.PrimaryPart
+	if hrp and enemyRoot then
+		local dist = (hrp.Position - enemyRoot.Position).Magnitude
+		if dist > 500 then
+			warn(string.format("[LaserGunServer] Suspicious shot from %s — distance %.1f", player.Name, dist))
+			return
+		end
+	end
+
+	-- Deal damage
+	humanoid:TakeDamage(50)
+	print(string.format("[LaserGunServer] %s hit enemy — HP now %.0f", player.Name, humanoid.Health))
+
+	-- Fire back to all clients to show the laser beam visual
+	laserFired:FireAllClients(player, hitPosition)
+end
+
+laserFired.OnServerEvent:Connect(onLaserFired)
+
+print("[LaserGunServer] Loaded — listening for laser shots.")
+]]></ProtectedString>
+				<bool name="Disabled">false</bool>
 				<Content name="LinkedSource"><null></null></Content>
-				<ProtectedString name="Source"></ProtectedString>
-				<string name="ScriptGuid">{9C62C8C2-12DE-4AC3-B9E1-CF65F6B07ABE}</string>
+				<token name="RunContext">0</token>
+				<string name="ScriptGuid">{D49D830E-3F01-4D0A-B588-3A489DE3762A}</string>
 				<BinaryString name="AttributesSerialize"></BinaryString>
 				<SecurityCapabilities name="Capabilities">0</SecurityCapabilities>
 				<bool name="DefinesCapabilities">false</bool>
 				<UniqueId name="HistoryId">00000000000000000000000000000000</UniqueId>
-				<string name="Name">Test</string>
+				<string name="Name">LaserGunServer</string>
 				<int64 name="SourceAssetId">-1</int64>
 				<BinaryString name="Tags"></BinaryString>
-				<UniqueId name="UniqueId">6bf9652ea5737aa20a421a9800000a9a</UniqueId>
+				<UniqueId name="UniqueId">0e108733dfbced4a0a43145d00001724</UniqueId>
 			</Properties>
 		</Item>
-		<Item class="Script" referent="RBX4C894320C3924675BA67379AE36172B1">
+		<Item class="Script" referent="RBX6BC324447FA04617A960BC5E75970BEC">
 			<Properties>
-				<ProtectedString name="Source"><![CDATA[-- WaveManager: Phase 1 - Enemy Spawning
--- Enemies spawn in a ring around players each wave.
--- No chasing yet — just spawning. Test: hit Play and see enemies appear.
+				<ProtectedString name="Source"><![CDATA[-- WaveManager: Phase 1 + 4 - Enemy Spawning & Wave Progression
+-- Spawns enemies in rings around players, waves escalate, short pause between waves.
 
 local ServerStorage = game:GetService("ServerStorage")
 local Players = game:GetService("Players")
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
 
 -- CONFIG
-local WAVE_PAUSE = 5          -- seconds between waves
-local BASE_ENEMIES = 5        -- enemies on wave 1
-local ENEMIES_PER_WAVE = 3    -- extra enemies added each wave
-local SPAWN_RADIUS = 30       -- how far from players enemies spawn
+local WAVE_PAUSE = 5           -- seconds between waves
+local BASE_ENEMIES = 5         -- enemies on wave 1
+local ENEMIES_PER_WAVE = 3     -- extra enemies added each wave
+local SPAWN_RADIUS = 30        -- how far from players enemies spawn
+local WAVE_CLEAR_TIMEOUT = 60  -- max seconds to wait for all enemies to die before forcing next wave
 
 -- State
 local currentWave = 0
-while true do
 local waveActive = false
-end 
--- Wait for the EnemyTemplate to exist in ServerStorage
-local enemyTemplate = ServerStorage:WaitForChild("EnemyTemplate", 10)
-if not enemyTemplate then
-	warn("[WaveManager] EnemyTemplate not found in ServerStorage!")
-	return
+local activeEnemies = 0
+local waveCleared = Instance.new("BindableEvent") -- fires when all enemies are dead
+
+-- Notify other scripts about wave state
+local waveInfoEvent = ReplicatedStorage:FindFirstChild("WaveInfo")
+if not waveInfoEvent then
+	waveInfoEvent = Instance.new("RemoteEvent")
+	waveInfoEvent.Name = "WaveInfo"
+	waveInfoEvent.Parent = ReplicatedStorage
 end
 
--- Get a random spawn position around a target position
+-- Broadcast wave number to all clients (for HUD in Phase 5)
+local function broadcastWave(waveNumber: number)
+	waveInfoEvent:FireAllClients("Wave", waveNumber)
+end
+
+-- Get a random spawn position around a center point
 local function getSpawnPosition(center: Vector3): Vector3
 	local angle = math.random() * 2 * math.pi
 	local x = center.X + math.cos(angle) * SPAWN_RADIUS
@@ -1650,11 +2033,18 @@ local function getRandomPlayerPosition(): Vector3
 	return positions[math.random(#positions)]
 end
 
--- Spawn a single enemy
+-- Spawn a single enemy and track it
 local function spawnEnemy(spawnPos: Vector3)
+	local enemyTemplate = ServerStorage:FindFirstChild("EnemyTemplate")
+	if not enemyTemplate then
+		warn("[WaveManager] EnemyTemplate missing!")
+		return
+	end
+
 	local enemy = enemyTemplate:Clone()
 	enemy.Name = "Enemy"
 	enemy.Parent = workspace
+
 	if enemy.PrimaryPart then
 		enemy:SetPrimaryPartCFrame(CFrame.new(spawnPos))
 	else
@@ -1665,12 +2055,26 @@ local function spawnEnemy(spawnPos: Vector3)
 			end
 		end
 	end
+
+	activeEnemies += 1
+
+	-- Track when this enemy dies
+	local humanoid = enemy:FindFirstChildOfClass("Humanoid")
+	if humanoid then
+		humanoid.Died:Connect(function()
+			activeEnemies -= 1
+			if activeEnemies <= 0 and waveActive then
+				waveCleared:Fire()
+			end
+		end)
+	end
 end
 
 -- Spawn all enemies for a wave
 local function spawnWave(waveNumber: number)
 	local count = BASE_ENEMIES + (waveNumber - 1) * ENEMIES_PER_WAVE
 	print(string.format("[WaveManager] Wave %d starting — spawning %d enemies", waveNumber, count))
+	activeEnemies = 0
 	for i = 1, count do
 		local center = getRandomPlayerPosition()
 		local pos = getSpawnPosition(center)
@@ -1679,33 +2083,74 @@ local function spawnWave(waveNumber: number)
 	end
 end
 
--- Clean up all enemies from a previous wave
+-- Clean up any remaining enemies
 local function clearEnemies()
 	for _, obj in ipairs(workspace:GetChildren()) do
 		if obj.Name == "Enemy" then
 			obj:Destroy()
 		end
 	end
+	activeEnemies = 0
+end
+
+-- Wait for all enemies to die OR timeout
+local function waitForWaveClear()
+	if activeEnemies <= 0 then return end
+	local cleared = false
+	local conn = waveCleared.Event:Connect(function()
+		cleared = true
+	end)
+	local elapsed = 0
+	while not cleared and elapsed < WAVE_CLEAR_TIMEOUT do
+		task.wait(1)
+		elapsed += 1
+	end
+	conn:Disconnect()
+	if not cleared then
+		warn(string.format("[WaveManager] Wave %d timed out — forcing next wave", currentWave))
+	end
+end
+
+-- Count living players
+local function livingPlayerCount(): number
+	local count = 0
+	for _, player in ipairs(Players:GetPlayers()) do
+		local char = player.Character
+		if not char then continue end
+		local hum = char:FindFirstChildOfClass("Humanoid")
+		if hum and hum.Health > 0 and not char:FindFirstChild("Spectator") then
+			count += 1
+		end
+	end
+	return count
 end
 
 -- Main wave loop
 local function startWaveLoop()
 	while true do
-		repeat task.wait(1) until #Players:GetPlayers() > 0
+		-- Wait for at least one living player
+		repeat task.wait(1) until livingPlayerCount() > 0
 
 		currentWave += 1
 		waveActive = true
+
+		print(string.format("[WaveManager] === WAVE %d ===", currentWave))
+		broadcastWave(currentWave)
 		spawnWave(currentWave)
 
-		task.wait(20)
-		clearEnemies()
+		-- Wait until all enemies are killed (or timeout)
+		waitForWaveClear()
 		waveActive = false
+		clearEnemies() -- clean up any stragglers
 
-		print(string.format("[WaveManager] Wave %d over. Next wave in %d seconds.", currentWave, WAVE_PAUSE))
+		print(string.format("[WaveManager] Wave %d cleared! Next wave in %ds.", currentWave, WAVE_PAUSE))
+		broadcastWave(0) -- 0 = between waves signal for HUD
+
 		task.wait(WAVE_PAUSE)
 	end
 end
 
+-- Kick off
 task.delay(3, function()
 	startWaveLoop()
 end)
@@ -1715,7 +2160,7 @@ print("[WaveManager] Loaded — waiting 3 seconds before first wave.")
 				<bool name="Disabled">false</bool>
 				<Content name="LinkedSource"><null></null></Content>
 				<token name="RunContext">0</token>
-				<string name="ScriptGuid">{163DDD41-6C16-4B4B-899B-567B903734D7}</string>
+				<string name="ScriptGuid">{1F2DE754-2410-4ACD-B5AC-46D2A9B0824A}</string>
 				<BinaryString name="AttributesSerialize"></BinaryString>
 				<SecurityCapabilities name="Capabilities">0</SecurityCapabilities>
 				<bool name="DefinesCapabilities">false</bool>
@@ -1723,10 +2168,10 @@ print("[WaveManager] Loaded — waiting 3 seconds before first wave.")
 				<string name="Name">WaveManager</string>
 				<int64 name="SourceAssetId">-1</int64>
 				<BinaryString name="Tags"></BinaryString>
-				<UniqueId name="UniqueId">6b292a0608adc6a40a42e0a700002a42</UniqueId>
+				<UniqueId name="UniqueId">0e108733dfbced4a0a43145d00001982</UniqueId>
 			</Properties>
 		</Item>
-		<Item class="Script" referent="RBX33764A70118C4175B1112DDC6D56D99B">
+		<Item class="Script" referent="RBX9E116F017C7C4FF2BDE6C92F13C5187B">
 			<Properties>
 				<ProtectedString name="Source"><![CDATA[-- EnemyAI: Phase 2 - Chase & Explode
 -- Enemies chase the nearest living player.
@@ -1736,12 +2181,11 @@ local Players = game:GetService("Players")
 local PathfindingService = game:GetService("PathfindingService")
 
 -- CONFIG
-local DAMAGE = 50           -- damage dealt on explosion (2 hits = dead)
-local EXPLOSION_RADIUS = 8  -- stud radius of explosion effect
-local CHASE_INTERVAL = 0.5  -- how often the enemy recalculates its path
-local DETECT_RANGE = 200    -- studs; enemies ignore players beyond this
+local DAMAGE = 50
+local EXPLOSION_RADIUS = 8
+local CHASE_INTERVAL = 0.5
+local DETECT_RANGE = 200
 
--- Get the nearest living (non-spectator) player to a position
 local function getNearestPlayer(fromPos: Vector3)
 	local nearest = nil
 	local nearestDist = DETECT_RANGE
@@ -1752,7 +2196,6 @@ local function getNearestPlayer(fromPos: Vector3)
 		local hum = char:FindFirstChildOfClass("Humanoid")
 		if not hrp or not hum then continue end
 		if hum.Health <= 0 then continue end
-		-- Ignore spectators (tagged in Phase 6)
 		if char:FindFirstChild("Spectator") then continue end
 		local dist = (hrp.Position - fromPos).Magnitude
 		if dist < nearestDist then
@@ -1763,21 +2206,16 @@ local function getNearestPlayer(fromPos: Vector3)
 	return nearest
 end
 
--- Make the enemy explode and deal damage to nearby players
 local function explode(enemy: Model)
 	local root = enemy.PrimaryPart
 	if not root then return end
 	local pos = root.Position
-
-	-- Visual explosion
 	local explosion = Instance.new("Explosion")
 	explosion.Position = pos
 	explosion.BlastRadius = EXPLOSION_RADIUS
-	explosion.BlastPressure = 0  -- no physics knockback, we handle damage manually
-	explosion.DestroyJointRadiusPercent = 0  -- don't destroy the map
+	explosion.BlastPressure = 0
+	explosion.DestroyJointRadiusPercent = 0
 	explosion.Parent = workspace
-
-	-- Deal damage to players in radius
 	for _, player in ipairs(Players:GetPlayers()) do
 		local char = player.Character
 		if not char then continue end
@@ -1789,18 +2227,13 @@ local function explode(enemy: Model)
 			hum:TakeDamage(DAMAGE)
 		end
 	end
-
-	-- Remove the enemy
 	enemy:Destroy()
 end
 
--- Chase logic for a single enemy
 local function startChase(enemy: Model)
 	local humanoid = enemy:FindFirstChildOfClass("Humanoid")
 	local root = enemy.PrimaryPart
 	if not humanoid or not root then return end
-
-	-- Touch detection: explode when touching a player
 	local exploded = false
 	for _, part in ipairs(enemy:GetDescendants()) do
 		if part:IsA("BasePart") then
@@ -1817,8 +2250,6 @@ local function startChase(enemy: Model)
 			end)
 		end
 	end
-
-	-- Pathfinding loop
 	task.spawn(function()
 		while enemy and enemy.Parent and not exploded do
 			local target = getNearestPlayer(root.Position)
@@ -1830,12 +2261,11 @@ local function startChase(enemy: Model)
 						AgentRadius = 2,
 						AgentCanJump = true,
 					})
-					local ok, err = pcall(function()
+					local ok = pcall(function()
 						path:ComputeAsync(root.Position, targetHRP.Position)
 					end)
 					if ok and path.Status == Enum.PathStatus.Success then
-						local waypoints = path:GetWaypoints()
-						for _, wp in ipairs(waypoints) do
+						for _, wp in ipairs(path:GetWaypoints()) do
 							if exploded or not enemy.Parent then break end
 							if wp.Action == Enum.PathWaypointAction.Jump then
 								humanoid.Jump = true
@@ -1844,7 +2274,6 @@ local function startChase(enemy: Model)
 							humanoid.MoveToFinished:Wait()
 						end
 					else
-						-- Fallback: direct move if pathfinding fails
 						humanoid:MoveTo(targetHRP.Position)
 					end
 				end
@@ -1854,10 +2283,8 @@ local function startChase(enemy: Model)
 	end)
 end
 
--- Watch for new enemies added to workspace and start their AI
 workspace.ChildAdded:Connect(function(child)
 	if child.Name == "Enemy" and child:IsA("Model") then
-		-- Small delay to let the model fully initialize
 		task.wait(0.1)
 		startChase(child)
 	end
@@ -1868,7 +2295,7 @@ print("[EnemyAI] Loaded — watching for enemies.")
 				<bool name="Disabled">false</bool>
 				<Content name="LinkedSource"><null></null></Content>
 				<token name="RunContext">0</token>
-				<string name="ScriptGuid">{9FE08752-9908-478C-BC40-556A459424F9}</string>
+				<string name="ScriptGuid">{8D92AA8E-5D6E-4FEC-BD12-C8F26F216FD5}</string>
 				<BinaryString name="AttributesSerialize"></BinaryString>
 				<SecurityCapabilities name="Capabilities">0</SecurityCapabilities>
 				<bool name="DefinesCapabilities">false</bool>
@@ -1876,25 +2303,7 @@ print("[EnemyAI] Loaded — watching for enemies.")
 				<string name="Name">EnemyAI</string>
 				<int64 name="SourceAssetId">-1</int64>
 				<BinaryString name="Tags"></BinaryString>
-				<UniqueId name="UniqueId">6b292a0608adc6a40a42e0a700002a44</UniqueId>
-			</Properties>
-		</Item>
-		<Item class="Script" referent="RBX97147B1C86A0421397947FD50ECA7FFC">
-			<Properties>
-				<ProtectedString name="Source"><![CDATA[print("Hello world, from server!")
-]]></ProtectedString>
-				<bool name="Disabled">false</bool>
-				<Content name="LinkedSource"><null></null></Content>
-				<token name="RunContext">0</token>
-				<string name="ScriptGuid">{9F1D5682-5B28-426A-A787-B4662B5421E6}</string>
-				<BinaryString name="AttributesSerialize"></BinaryString>
-				<SecurityCapabilities name="Capabilities">0</SecurityCapabilities>
-				<bool name="DefinesCapabilities">false</bool>
-				<UniqueId name="HistoryId">00000000000000000000000000000000</UniqueId>
-				<string name="Name">Server</string>
-				<int64 name="SourceAssetId">-1</int64>
-				<BinaryString name="Tags"></BinaryString>
-				<UniqueId name="UniqueId">59f334f572a46a2c0a430089000008da</UniqueId>
+				<UniqueId name="UniqueId">0e108733dfbced4a0a43145d00001984</UniqueId>
 			</Properties>
 		</Item>
 	</Item>
