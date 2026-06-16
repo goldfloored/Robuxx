@@ -109,18 +109,18 @@
 		<Item class="Camera" referent="RBXAA22F8B3411843AFACFD394AD21A8B1C">
 			<Properties>
 				<CoordinateFrame name="CFrame">
-					<X>-19.5995693</X>
-					<Y>14.4037552</Y>
-					<Z>-19.1286163</Z>
-					<R00>-0.681009471</R00>
-					<R01>0.437950701</R01>
-					<R02>-0.586877584</R02>
-					<R10>-0</R10>
-					<R11>0.80144465</R11>
-					<R12>0.598068953</R12>
-					<R20>0.732274592</R20>
-					<R21>0.407290608</R21>
-					<R22>-0.545791447</R22>
+					<X>-20.0428696</X>
+					<Y>14.3699265</Y>
+					<Z>-18.2219086</Z>
+					<R00>-0.113588497</R00>
+					<R01>0.577392638</R01>
+					<R02>-0.808526695</R02>
+					<R10>7.4505806e-09</R10>
+					<R11>0.813793659</R11>
+					<R12>0.581153929</R12>
+					<R20>0.993527889</R20>
+					<R21>0.0660123974</R21>
+					<R22>-0.0924376026</R22>
 				</CoordinateFrame>
 				<Ref name="CameraSubject">null</Ref>
 				<token name="CameraType">0</token>
@@ -169,7 +169,7 @@
 				<token name="BottomSurfaceInput">0</token>
 				<CoordinateFrame name="CFrame">
 					<X>0</X>
-					<Y>-8</Y>
+					<Y>-10</Y>
 					<Z>0</Z>
 					<R00>1</R00>
 					<R01>0</R01>
@@ -187,7 +187,7 @@
 				<bool name="CastShadow">true</bool>
 				<string name="CollisionGroup">Default</string>
 				<int name="CollisionGroupId">0</int>
-				<Color3uint8 name="Color3uint8">4284177243</Color3uint8>
+				<Color3uint8 name="Color3uint8">4284636770</Color3uint8>
 				<PhysicalProperties name="CustomPhysicalProperties">
 					<CustomPhysics>false</CustomPhysics>
 				</PhysicalProperties>
@@ -240,9 +240,9 @@
 					<Z>0</Z>
 				</Vector3>
 				<Vector3 name="size">
-					<X>2048</X>
-					<Y>16</Y>
-					<Z>2048</Z>
+					<X>512</X>
+					<Y>20</Y>
+					<Z>512</Z>
 				</Vector3>
 				<BinaryString name="AttributesSerialize"></BinaryString>
 				<SecurityCapabilities name="Capabilities">0</SecurityCapabilities>
@@ -1216,6 +1216,24 @@ zNLfaoZA///+//PAj5CH]]></BinaryString>
 				<BinaryString name="Tags"></BinaryString>
 				<UniqueId name="UniqueId">6bf9652ea5737aa20a421a98000003bf</UniqueId>
 			</Properties>
+			<Item class="LocalScript" referent="RBX1AC8B85359904D77A6A41A18C69E2EB3">
+				<Properties>
+					<ProtectedString name="Source"><![CDATA[print("Hello world, from client!")
+]]></ProtectedString>
+					<bool name="Disabled">false</bool>
+					<Content name="LinkedSource"><null></null></Content>
+					<token name="RunContext">0</token>
+					<string name="ScriptGuid">{CEDB4AFA-BA96-4D08-9249-7BAEF9EA8F15}</string>
+					<BinaryString name="AttributesSerialize"></BinaryString>
+					<SecurityCapabilities name="Capabilities">0</SecurityCapabilities>
+					<bool name="DefinesCapabilities">false</bool>
+					<UniqueId name="HistoryId">00000000000000000000000000000000</UniqueId>
+					<string name="Name">Client</string>
+					<int64 name="SourceAssetId">-1</int64>
+					<BinaryString name="Tags"></BinaryString>
+					<UniqueId name="UniqueId">59f334f572a46a2c0a430089000008d4</UniqueId>
+				</Properties>
+			</Item>
 		</Item>
 		<Item class="StarterCharacterScripts" referent="RBX2F82655C16E04CB5AE8529526BF54A56">
 			<Properties>
@@ -1525,6 +1543,36 @@ zNLfaoZA///+//PAj5CH]]></BinaryString>
 			<BinaryString name="Tags"></BinaryString>
 			<UniqueId name="UniqueId">6bf9652ea5737aa20a421a980000038d</UniqueId>
 		</Properties>
+		<Item class="Folder" referent="RBX1208B1A365F94D47B217C9ADE3A92C77">
+			<Properties>
+				<BinaryString name="AttributesSerialize"></BinaryString>
+				<SecurityCapabilities name="Capabilities">0</SecurityCapabilities>
+				<bool name="DefinesCapabilities">false</bool>
+				<UniqueId name="HistoryId">00000000000000000000000000000000</UniqueId>
+				<string name="Name">Shared</string>
+				<int64 name="SourceAssetId">-1</int64>
+				<BinaryString name="Tags"></BinaryString>
+				<UniqueId name="UniqueId">59f334f572a46a2c0a430089000008d7</UniqueId>
+			</Properties>
+			<Item class="ModuleScript" referent="RBX5B1FFDB8715F4F578784B376CD7DAB64">
+				<Properties>
+					<Content name="LinkedSource"><null></null></Content>
+					<ProtectedString name="Source"><![CDATA[return function()
+	print("Hello, world!")
+end
+]]></ProtectedString>
+					<string name="ScriptGuid">{46B08303-7175-46FA-8FCB-5EE0F924F2B9}</string>
+					<BinaryString name="AttributesSerialize"></BinaryString>
+					<SecurityCapabilities name="Capabilities">0</SecurityCapabilities>
+					<bool name="DefinesCapabilities">false</bool>
+					<UniqueId name="HistoryId">00000000000000000000000000000000</UniqueId>
+					<string name="Name">Hello</string>
+					<int64 name="SourceAssetId">-1</int64>
+					<BinaryString name="Tags"></BinaryString>
+					<UniqueId name="UniqueId">59f334f572a46a2c0a430089000008d8</UniqueId>
+				</Properties>
+			</Item>
+		</Item>
 	</Item>
 	<Item class="ServerScriptService" referent="RBX98FAB21C927A4DCE80373D7CC73E9E0E">
 		<Properties>
@@ -1829,6 +1877,24 @@ print("[EnemyAI] Loaded — watching for enemies.")
 				<int64 name="SourceAssetId">-1</int64>
 				<BinaryString name="Tags"></BinaryString>
 				<UniqueId name="UniqueId">6b292a0608adc6a40a42e0a700002a44</UniqueId>
+			</Properties>
+		</Item>
+		<Item class="Script" referent="RBX97147B1C86A0421397947FD50ECA7FFC">
+			<Properties>
+				<ProtectedString name="Source"><![CDATA[print("Hello world, from server!")
+]]></ProtectedString>
+				<bool name="Disabled">false</bool>
+				<Content name="LinkedSource"><null></null></Content>
+				<token name="RunContext">0</token>
+				<string name="ScriptGuid">{9F1D5682-5B28-426A-A787-B4662B5421E6}</string>
+				<BinaryString name="AttributesSerialize"></BinaryString>
+				<SecurityCapabilities name="Capabilities">0</SecurityCapabilities>
+				<bool name="DefinesCapabilities">false</bool>
+				<UniqueId name="HistoryId">00000000000000000000000000000000</UniqueId>
+				<string name="Name">Server</string>
+				<int64 name="SourceAssetId">-1</int64>
+				<BinaryString name="Tags"></BinaryString>
+				<UniqueId name="UniqueId">59f334f572a46a2c0a430089000008da</UniqueId>
 			</Properties>
 		</Item>
 	</Item>
@@ -2944,11 +3010,11 @@ print("[EnemyAI] Loaded — watching for enemies.")
 	<Item class="Lighting" referent="RBXF9BE36CCC75A46609746A54F5B909B7E">
 		<Properties>
 			<Color3 name="Ambient">
-				<R>0.274509817</R>
-				<G>0.274509817</G>
-				<B>0.274509817</B>
+				<R>0</R>
+				<G>0</G>
+				<B>0</B>
 			</Color3>
-			<float name="Brightness">3</float>
+			<float name="Brightness">2</float>
 			<Color3 name="ColorShift_Bottom">
 				<R>0</R>
 				<G>0</G>
@@ -3206,6 +3272,18 @@ WF9PcmlnaW5hbFRlY2hub2xvZ3lPbkZpbGVMb2FkBAMAAAA=]]></BinaryString>
 			<int64 name="SourceAssetId">-1</int64>
 			<BinaryString name="Tags"></BinaryString>
 			<UniqueId name="UniqueId">6bf9652ea5737aa20a421a98000003da</UniqueId>
+		</Properties>
+	</Item>
+	<Item class="SerializationService" referent="RBX404C55BED2E24D86B6095FDC37B9EEE0">
+		<Properties>
+			<BinaryString name="AttributesSerialize"></BinaryString>
+			<SecurityCapabilities name="Capabilities">0</SecurityCapabilities>
+			<bool name="DefinesCapabilities">false</bool>
+			<UniqueId name="HistoryId">00000000000000000000000000000000</UniqueId>
+			<string name="Name">SerializationService</string>
+			<int64 name="SourceAssetId">-1</int64>
+			<BinaryString name="Tags"></BinaryString>
+			<UniqueId name="UniqueId">59f334f572a46a2c0a430089000005cd</UniqueId>
 		</Properties>
 	</Item>
 	<SharedStrings>
