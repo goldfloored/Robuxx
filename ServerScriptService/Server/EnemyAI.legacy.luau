@@ -1,32 +1,23 @@
 -- EnemyAI: Phase 2 - Chase & Explode
--- Enemies chase the nearest living player.
--- When they touch a player they explode, dealing damage.
-
 local Players = game:GetService("Players")
 local PathfindingService = game:GetService("PathfindingService")
 
--- CONFIG
 local DAMAGE = 50
 local EXPLOSION_RADIUS = 8
 local CHASE_INTERVAL = 0.5
 local DETECT_RANGE = 200
 
 local function getNearestPlayer(fromPos: Vector3)
-	local nearest = nil
-	local nearestDist = DETECT_RANGE
+	local nearest, nearestDist = nil, DETECT_RANGE
 	for _, player in ipairs(Players:GetPlayers()) do
 		local char = player.Character
 		if not char then continue end
 		local hrp = char:FindFirstChild("HumanoidRootPart")
 		local hum = char:FindFirstChildOfClass("Humanoid")
-		if not hrp or not hum then continue end
-		if hum.Health <= 0 then continue end
+		if not hrp or not hum or hum.Health <= 0 then continue end
 		if char:FindFirstChild("Spectator") then continue end
 		local dist = (hrp.Position - fromPos).Magnitude
-		if dist < nearestDist then
-			nearest = player
-			nearestDist = dist
-		end
+		if dist < nearestDist then nearest = player nearestDist = dist end
 	end
 	return nearest
 end
@@ -81,20 +72,12 @@ local function startChase(enemy: Model)
 			if target and target.Character then
 				local targetHRP = target.Character:FindFirstChild("HumanoidRootPart")
 				if targetHRP then
-					local path = PathfindingService:CreatePath({
-						AgentHeight = 5,
-						AgentRadius = 2,
-						AgentCanJump = true,
-					})
-					local ok = pcall(function()
-						path:ComputeAsync(root.Position, targetHRP.Position)
-					end)
+					local path = PathfindingService:CreatePath({ AgentHeight = 5, AgentRadius = 2, AgentCanJump = true })
+					local ok = pcall(function() path:ComputeAsync(root.Position, targetHRP.Position) end)
 					if ok and path.Status == Enum.PathStatus.Success then
 						for _, wp in ipairs(path:GetWaypoints()) do
 							if exploded or not enemy.Parent then break end
-							if wp.Action == Enum.PathWaypointAction.Jump then
-								humanoid.Jump = true
-							end
+							if wp.Action == Enum.PathWaypointAction.Jump then humanoid.Jump = true end
 							humanoid:MoveTo(wp.Position)
 							humanoid.MoveToFinished:Wait()
 						end
@@ -115,4 +98,4 @@ workspace.ChildAdded:Connect(function(child)
 	end
 end)
 
-print("[EnemyAI] Loaded — watching for enemies.")
+print("[EnemyAI] Loaded.")
