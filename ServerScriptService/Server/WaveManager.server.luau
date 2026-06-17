@@ -46,7 +46,10 @@ end
 
 local function spawnEnemy(spawnPos: Vector3)
 	local enemyTemplate = ServerStorage:FindFirstChild("EnemyTemplate")
-	if not enemyTemplate then warn("[WaveManager] EnemyTemplate missing!") return end
+	if not enemyTemplate then
+		warn("[WaveManager] EnemyTemplate missing!")
+		return
+	end
 	local enemy = enemyTemplate:Clone()
 	enemy.Name = "Enemy"
 	enemy.Parent = workspace

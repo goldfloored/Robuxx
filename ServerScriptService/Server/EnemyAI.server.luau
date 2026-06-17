@@ -17,7 +17,10 @@ local function getNearestPlayer(fromPos: Vector3)
 		if not hrp or not hum or hum.Health <= 0 then continue end
 		if char:FindFirstChild("Spectator") then continue end
 		local dist = (hrp.Position - fromPos).Magnitude
-		if dist < nearestDist then nearest = player nearestDist = dist end
+		if dist < nearestDist then
+			nearest = player
+			nearestDist = dist
+		end
 	end
 	return nearest
 end
