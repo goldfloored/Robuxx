@@ -1259,7 +1259,7 @@ zNLfaoZA///+//PAj5CH]]></BinaryString>
 			<BinaryString name="Tags"></BinaryString>
 			<UniqueId name="UniqueId">6bf9652ea5737aa20a421a980000035f</UniqueId>
 		</Properties>
-		<Item class="Tool" referent="RBX74621BB01F9F44F389EB2D0EAC652DB5">
+		<Item class="Tool" referent="RBX3D552D1C4F9A4C15B97B1D596C2BC154">
 			<Properties>
 				<bool name="CanBeDropped">true</bool>
 				<bool name="Enabled">true</bool>
@@ -1315,9 +1315,9 @@ zNLfaoZA///+//PAj5CH]]></BinaryString>
 				<string name="Name">LaserGun</string>
 				<int64 name="SourceAssetId">-1</int64>
 				<BinaryString name="Tags"></BinaryString>
-				<UniqueId name="UniqueId">0e108733dfbced4a0a43145d00001726</UniqueId>
+				<UniqueId name="UniqueId">0855d1c4531d42200a433f2b00000a47</UniqueId>
 			</Properties>
-			<Item class="Part" referent="RBXE870E08968584392BE70B80A055202B8">
+			<Item class="Part" referent="RBXD47E5EA78F6E4A6C86532E5A1BB3C474">
 				<Properties>
 					<token name="shape">1</token>
 					<token name="formFactorRaw">1</token>
@@ -1415,9 +1415,9 @@ zNLfaoZA///+//PAj5CH]]></BinaryString>
 					<string name="Name">Handle</string>
 					<int64 name="SourceAssetId">-1</int64>
 					<BinaryString name="Tags"></BinaryString>
-					<UniqueId name="UniqueId">0e108733dfbced4a0a43145d00001727</UniqueId>
+					<UniqueId name="UniqueId">0855d1c4531d42200a433f2b00000a48</UniqueId>
 				</Properties>
-				<Item class="Attachment" referent="RBX56BA50AAB701424486FC9587D0F4B2FA">
+				<Item class="Attachment" referent="RBX567FE2A4A34F4DABA218C6AA8C86367D">
 					<Properties>
 						<CoordinateFrame name="CFrame">
 							<X>0</X>
@@ -1441,11 +1441,11 @@ zNLfaoZA///+//PAj5CH]]></BinaryString>
 						<string name="Name">Muzzle</string>
 						<int64 name="SourceAssetId">-1</int64>
 						<BinaryString name="Tags"></BinaryString>
-						<UniqueId name="UniqueId">0e108733dfbced4a0a43145d00001728</UniqueId>
+						<UniqueId name="UniqueId">0855d1c4531d42200a433f2b00000a49</UniqueId>
 					</Properties>
 				</Item>
 			</Item>
-			<Item class="LocalScript" referent="RBXFD98BE86F3CF451CA3AD2079FB539774">
+			<Item class="LocalScript" referent="RBXA5C47BCAD5584BFD820891B685D61750">
 				<Properties>
 					<ProtectedString name="Source"><![CDATA[-- LaserGun LocalScript: Phase 3 - Client Side
 local Players = game:GetService("Players")
@@ -1530,7 +1530,7 @@ print("[LaserGun] LocalScript loaded.")
 					<bool name="Disabled">false</bool>
 					<Content name="LinkedSource"><null></null></Content>
 					<token name="RunContext">0</token>
-					<string name="ScriptGuid">{8CAA54E7-4091-4E27-BE27-677B8E62D3E6}</string>
+					<string name="ScriptGuid">{BC2D21C1-47D2-4CD9-874F-7BC1A384F276}</string>
 					<BinaryString name="AttributesSerialize"></BinaryString>
 					<SecurityCapabilities name="Capabilities">0</SecurityCapabilities>
 					<bool name="DefinesCapabilities">false</bool>
@@ -1538,7 +1538,7 @@ print("[LaserGun] LocalScript loaded.")
 					<string name="Name">LocalScript</string>
 					<int64 name="SourceAssetId">-1</int64>
 					<BinaryString name="Tags"></BinaryString>
-					<UniqueId name="UniqueId">0e108733dfbced4a0a43145d00001729</UniqueId>
+					<UniqueId name="UniqueId">0855d1c4531d42200a433f2b00000a4a</UniqueId>
 				</Properties>
 			</Item>
 		</Item>
@@ -1868,6 +1868,18 @@ end
 				<UniqueId name="UniqueId">0e108733dfbced4a0a43145d00001723</UniqueId>
 			</Properties>
 		</Item>
+		<Item class="RemoteEvent" referent="RBX8C3896DC832F4EADAFAF487AC3229740">
+			<Properties>
+				<BinaryString name="AttributesSerialize"></BinaryString>
+				<SecurityCapabilities name="Capabilities">0</SecurityCapabilities>
+				<bool name="DefinesCapabilities">false</bool>
+				<UniqueId name="HistoryId">00000000000000000000000000000000</UniqueId>
+				<string name="Name">WaveInfo</string>
+				<int64 name="SourceAssetId">-1</int64>
+				<BinaryString name="Tags"></BinaryString>
+				<UniqueId name="UniqueId">0855d1c4531d42200a433f2b00000a3f</UniqueId>
+			</Properties>
+		</Item>
 	</Item>
 	<Item class="ServerScriptService" referent="RBX98FAB21C927A4DCE80373D7CC73E9E0E">
 		<Properties>
@@ -1881,7 +1893,7 @@ end
 			<BinaryString name="Tags"></BinaryString>
 			<UniqueId name="UniqueId">6bf9652ea5737aa20a421a980000038e</UniqueId>
 		</Properties>
-		<Item class="Folder" referent="RBX936B5A505DB14E79B51C14D011088A39">
+		<Item class="Folder" referent="RBXF2F88E9EE25D4497A523022403382FFC">
 			<Properties>
 				<BinaryString name="AttributesSerialize"></BinaryString>
 				<SecurityCapabilities name="Capabilities">0</SecurityCapabilities>
@@ -1890,9 +1902,9 @@ end
 				<string name="Name">Server</string>
 				<int64 name="SourceAssetId">-1</int64>
 				<BinaryString name="Tags"></BinaryString>
-				<UniqueId name="UniqueId">0e108733dfbced4a0a43145d000025c0</UniqueId>
+				<UniqueId name="UniqueId">0855d1c4531d42200a433f2b00000a40</UniqueId>
 			</Properties>
-			<Item class="Script" referent="RBX813CF85AEBCC43E2B8AFF2667A64B99E">
+			<Item class="Script" referent="RBXF192930AF8AF46EC93DD27767B671536">
 				<Properties>
 					<ProtectedString name="Source"><![CDATA[-- WaveManager: Phase 1 + 4 - Enemy Spawning & Wave Progression
 local ServerStorage = game:GetService("ServerStorage")
@@ -1910,15 +1922,12 @@ local waveActive = false
 local activeEnemies = 0
 local waveCleared = Instance.new("BindableEvent")
 
-local waveInfoEvent = ReplicatedStorage:FindFirstChild("WaveInfo")
-if not waveInfoEvent then
-	waveInfoEvent = Instance.new("RemoteEvent")
-	waveInfoEvent.Name = "WaveInfo"
-	waveInfoEvent.Parent = ReplicatedStorage
-end
+local waveInfoEvent = ReplicatedStorage:WaitForChild("WaveInfo", 10)
 
 local function broadcastWave(waveNumber: number)
-	waveInfoEvent:FireAllClients("Wave", waveNumber)
+	if waveInfoEvent then
+		waveInfoEvent:FireAllClients("Wave", waveNumber)
+	end
 end
 
 local function getSpawnPosition(center: Vector3): Vector3
@@ -2028,7 +2037,7 @@ print("[WaveManager] Loaded.")
 					<bool name="Disabled">false</bool>
 					<Content name="LinkedSource"><null></null></Content>
 					<token name="RunContext">0</token>
-					<string name="ScriptGuid">{283851E4-CFF2-4BAC-9543-521474EB7EFF}</string>
+					<string name="ScriptGuid">{E1F949DB-30DB-4E70-9214-4D415CE42DFF}</string>
 					<BinaryString name="AttributesSerialize"></BinaryString>
 					<SecurityCapabilities name="Capabilities">0</SecurityCapabilities>
 					<bool name="DefinesCapabilities">false</bool>
@@ -2036,10 +2045,10 @@ print("[WaveManager] Loaded.")
 					<string name="Name">WaveManager</string>
 					<int64 name="SourceAssetId">-1</int64>
 					<BinaryString name="Tags"></BinaryString>
-					<UniqueId name="UniqueId">0e108733dfbced4a0a43145d000025c1</UniqueId>
+					<UniqueId name="UniqueId">0855d1c4531d42200a433f2b00000a41</UniqueId>
 				</Properties>
 			</Item>
-			<Item class="Script" referent="RBXF8363EF413B4435FB48EC649D378B0B7">
+			<Item class="Script" referent="RBX3E76111D1D6D463C9428BBECD64BE79F">
 				<Properties>
 					<ProtectedString name="Source"><![CDATA[-- EnemyAI: Phase 2 - Chase & Explode
 local Players = game:GetService("Players")
@@ -2146,7 +2155,7 @@ print("[EnemyAI] Loaded.")
 					<bool name="Disabled">false</bool>
 					<Content name="LinkedSource"><null></null></Content>
 					<token name="RunContext">0</token>
-					<string name="ScriptGuid">{0F9D6C71-1900-462C-9E35-4F2E90883F32}</string>
+					<string name="ScriptGuid">{72CDD48E-451E-41CC-8899-2E044C31E2F6}</string>
 					<BinaryString name="AttributesSerialize"></BinaryString>
 					<SecurityCapabilities name="Capabilities">0</SecurityCapabilities>
 					<bool name="DefinesCapabilities">false</bool>
@@ -2154,10 +2163,10 @@ print("[EnemyAI] Loaded.")
 					<string name="Name">EnemyAI</string>
 					<int64 name="SourceAssetId">-1</int64>
 					<BinaryString name="Tags"></BinaryString>
-					<UniqueId name="UniqueId">0e108733dfbced4a0a43145d000025c3</UniqueId>
+					<UniqueId name="UniqueId">0855d1c4531d42200a433f2b00000a43</UniqueId>
 				</Properties>
 			</Item>
-			<Item class="Script" referent="RBXB3186F94D03446669871FCAAEF874496">
+			<Item class="Script" referent="RBX457DB234336242CB8957A87C9A644121">
 				<Properties>
 					<ProtectedString name="Source"><![CDATA[-- LaserGunServer: Phase 3 - Server Side
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
@@ -2168,8 +2177,7 @@ local laserFired = ReplicatedStorage:WaitForChild("LaserFired")
 local function onLaserFired(player: Player, enemyModel: Model, hitPosition: Vector3)
 	if not player or not player.Character then return end
 	if not enemyModel or not enemyModel:IsA("Model") then return end
-	if enemyModel.Name ~= "Enemy" then return end
-	if not enemyModel.Parent then return end
+	if enemyModel.Name ~= "Enemy" or not enemyModel.Parent then return end
 	local humanoid = enemyModel:FindFirstChildOfClass("Humanoid")
 	if not humanoid or humanoid.Health <= 0 then return end
 	local hrp = player.Character:FindFirstChild("HumanoidRootPart")
@@ -2191,7 +2199,7 @@ print("[LaserGunServer] Loaded.")
 					<bool name="Disabled">false</bool>
 					<Content name="LinkedSource"><null></null></Content>
 					<token name="RunContext">0</token>
-					<string name="ScriptGuid">{EA63A702-4CF9-4247-B00E-CDB6D3C3BA87}</string>
+					<string name="ScriptGuid">{F6E98E3F-6829-41B5-B037-B3F5E7F64224}</string>
 					<BinaryString name="AttributesSerialize"></BinaryString>
 					<SecurityCapabilities name="Capabilities">0</SecurityCapabilities>
 					<bool name="DefinesCapabilities">false</bool>
@@ -2199,7 +2207,7 @@ print("[LaserGunServer] Loaded.")
 					<string name="Name">LaserGunServer</string>
 					<int64 name="SourceAssetId">-1</int64>
 					<BinaryString name="Tags"></BinaryString>
-					<UniqueId name="UniqueId">0e108733dfbced4a0a43145d000025c5</UniqueId>
+					<UniqueId name="UniqueId">0855d1c4531d42200a433f2b00000a45</UniqueId>
 				</Properties>
 			</Item>
 		</Item>
