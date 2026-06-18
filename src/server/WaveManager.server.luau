@@ -118,6 +118,7 @@ local function onPlayer(player: Player)
 	player.CharacterAdded:Connect(function(character)
 		onCharacter(player, character)
 	end)
+	-- Required: CharacterAutoLoads is false, so players only spawn when we load them.
 	player:LoadCharacter()
 end
 
