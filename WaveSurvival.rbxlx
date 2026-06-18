@@ -109,27 +109,27 @@
 		<Item class="Camera" referent="RBXAA22F8B3411843AFACFD394AD21A8B1C">
 			<Properties>
 				<CoordinateFrame name="CFrame">
-					<X>138.861557</X>
-					<Y>71.2273331</Y>
-					<Z>92.899086</Z>
-					<R00>-0.371069312</R00>
-					<R01>-0.357181907</R01>
-					<R02>0.857163131</R02>
-					<R10>7.4505806e-09</R10>
-					<R11>0.923065245</R11>
-					<R12>0.384643465</R12>
-					<R20>-0.928605199</R20>
-					<R21>0.142729387</R21>
-					<R22>-0.342521161</R22>
+					<X>110.752602</X>
+					<Y>61.6677246</Y>
+					<Z>90.0619659</Z>
+					<R00>0.0107862214</R00>
+					<R01>-0.479003131</R01>
+					<R02>0.87774694</R02>
+					<R10>4.65661287e-10</R10>
+					<R11>0.877797961</R11>
+					<R12>0.479030997</R12>
+					<R20>-0.999941826</R20>
+					<R21>-0.00516693387</R21>
+					<R22>0.00946812332</R22>
 				</CoordinateFrame>
 				<Ref name="CameraSubject">null</Ref>
 				<token name="CameraType">0</token>
 				<float name="FieldOfView">70</float>
 				<token name="FieldOfViewMode">0</token>
 				<CoordinateFrame name="Focus">
-					<X>137.147247</X>
-					<Y>70.4580536</Y>
-					<Z>93.5841217</Z>
+					<X>108.997116</X>
+					<Y>60.7096672</Y>
+					<Z>90.0430298</Z>
 					<R00>1</R00>
 					<R01>0</R01>
 					<R02>0</R02>
@@ -24568,9 +24568,10 @@ function BeachEnvironment.bakePalm(opts)
 			union.UsePartColor = false             -- keep each part's original colour
 			union.Anchored = true
 			union.CastShadow = false               -- shadows off for now
-			-- Walk-through scenery by default: a Union's collider is its bounding BOX
-			-- (canopy-wide), which makes invisible walls you bump into. So palms are
-			-- non-colliding. (plantPalms{palmCanCollide=true} re-enables it if needed.)
+			-- The visual mesh is always non-colliding: a Union's collider is its
+			-- bounding BOX (canopy-wide) = invisible walls. Touch/climb collision is
+			-- provided by the slim trunk truss + crown cap added in plantPalms, so the
+			-- only solid bits sit on the visible trunk, never in empty space.
 			union.CanCollide = false
 			local wrapper = Instance.new("Model")
 			wrapper.Name = "Palm"
@@ -24888,9 +24889,10 @@ function BeachEnvironment.bakePalm(opts)
 			union.UsePartColor = false             -- keep each part's original colour
 			union.Anchored = true
 			union.CastShadow = false               -- shadows off for now
-			-- Walk-through scenery by default: a Union's collider is its bounding BOX
-			-- (canopy-wide), which makes invisible walls you bump into. So palms are
-			-- non-colliding. (plantPalms{palmCanCollide=true} re-enables it if needed.)
+			-- The visual mesh is always non-colliding: a Union's collider is its
+			-- bounding BOX (canopy-wide) = invisible walls. Touch/climb collision is
+			-- provided by the slim trunk truss + crown cap added in plantPalms, so the
+			-- only solid bits sit on the visible trunk, never in empty space.
 			union.CanCollide = false
 			local wrapper = Instance.new("Model")
 			wrapper.Name = "Palm"
@@ -26715,6 +26717,399 @@ print("[SpectatorManager] Loaded.")
 				<BinaryString name="Tags"></BinaryString>
 				<UniqueId name="UniqueId">498d4c86fc87d5f70a4592c500006736</UniqueId>
 			</Properties>
+		</Item>
+		<Item class="Model" referent="RBX102078ECE4C3427F826313D3163D4D2F">
+			<Properties>
+				<token name="LevelOfDetail">0</token>
+				<CoordinateFrame name="ModelMeshCFrame">
+					<X>0.780387878</X>
+					<Y>4.68016624</Y>
+					<Z>1.46710968</Z>
+					<R00>-0.71427387</R00>
+					<R01>0</R01>
+					<R02>0.699866295</R02>
+					<R10>0</R10>
+					<R11>1</R11>
+					<R12>0</R12>
+					<R20>-0.699866295</R20>
+					<R21>0</R21>
+					<R22>-0.71427387</R22>
+				</CoordinateFrame>
+				<SharedString name="ModelMeshData">yuZpQdnvvUBOTYh1jqZ2cA==</SharedString>
+				<Vector3 name="ModelMeshSize">
+					<X>0</X>
+					<Y>0</Y>
+					<Z>0</Z>
+				</Vector3>
+				<token name="ModelStreamingMode">0</token>
+				<bool name="NeedsPivotMigration">false</bool>
+				<Ref name="PrimaryPart">RBX30D6B67440E047CAA1FB9BFEEFC17479</Ref>
+				<float name="ScaleFactor">1.99766016</float>
+				<SharedString name="SlimHash">yuZpQdnvvUBOTYh1jqZ2cA==</SharedString>
+				<OptionalCoordinateFrame name="WorldPivotData">
+					<CFrame>
+						<X>0</X>
+						<Y>12.127285</Y>
+						<Z>0</Z>
+						<R00>0</R00>
+						<R01>0.699866295</R01>
+						<R02>-0.71427387</R02>
+						<R10>1</R10>
+						<R11>0</R11>
+						<R12>0</R12>
+						<R20>0</R20>
+						<R21>-0.71427387</R21>
+						<R22>-0.699866295</R22>
+					</CFrame>
+				</OptionalCoordinateFrame>
+				<BinaryString name="AttributesSerialize"></BinaryString>
+				<SecurityCapabilities name="Capabilities">0</SecurityCapabilities>
+				<bool name="DefinesCapabilities">false</bool>
+				<UniqueId name="HistoryId">498d4c86fc87d5f70a4592c5000067ee</UniqueId>
+				<string name="Name">PalmTree</string>
+				<int64 name="SourceAssetId">-1</int64>
+				<BinaryString name="Tags"></BinaryString>
+				<UniqueId name="UniqueId">498d4c86fc87d5f70a4592c500007ed8</UniqueId>
+			</Properties>
+			<Item class="UnionOperation" referent="RBX30D6B67440E047CAA1FB9BFEEFC17479">
+				<Properties>
+					<Content name="AssetId"><null></null></Content>
+					<BinaryString name="ChildData"></BinaryString>
+					<SharedString name="ChildData2">gndrzuLKjmgTOZpl2F7VhQ==</SharedString>
+					<int name="ComponentIndex">-1</int>
+					<token name="FormFactor">3</token>
+					<Vector3 name="InitialSize">
+						<X>15.0442371</X>
+						<Y>12.14149</Y>
+						<Z>11.9570332</Z>
+					</Vector3>
+					<BinaryString name="MeshData"></BinaryString>
+					<SharedString name="MeshData2">XmoSSQmw/UtpWijkoG4gbQ==</SharedString>
+					<bool name="OffCentered">false</bool>
+					<BinaryString name="PhysicsData"></BinaryString>
+					<token name="RenderFidelity">0</token>
+					<float name="SmoothingAngle">0</float>
+					<NetAssetRef name="SolidMeshHolder">yuZpQdnvvUBOTYh1jqZ2cA==</NetAssetRef>
+					<int name="TriangleCount">1520</int>
+					<bool name="UsePartColor">false</bool>
+					<SharedString name="AeroMeshData">yuZpQdnvvUBOTYh1jqZ2cA==</SharedString>
+					<token name="FluidFidelityInternal">0</token>
+					<bool name="InertiaMigrated">false</bool>
+					<SharedString name="PhysicalConfigData">phUx9MjJ1OrYchL+SQ3kDQ==</SharedString>
+					<Vector3 name="UnscaledCofm">
+						<X>2.38028598</X>
+						<Y>-0.150009364</Y>
+						<Z>-0.579214513</Z>
+					</Vector3>
+					<Vector3 name="UnscaledVolInertiaDiags">
+						<X>491.012756</X>
+						<Y>1400.50342</Y>
+						<Z>1380.61145</Z>
+					</Vector3>
+					<Vector3 name="UnscaledVolInertiaOffDiags">
+						<X>-53.6684761</X>
+						<Y>-153.338074</Y>
+						<Z>-7.93389463</Z>
+					</Vector3>
+					<float name="UnscaledVolume">62.2731438</float>
+					<bool name="Anchored">true</bool>
+					<bool name="AudioCanCollide">true</bool>
+					<float name="BackParamA">-0.5</float>
+					<float name="BackParamB">0.5</float>
+					<token name="BackSurface">0</token>
+					<token name="BackSurfaceInput">0</token>
+					<float name="BottomParamA">-0.5</float>
+					<float name="BottomParamB">0.5</float>
+					<token name="BottomSurface">0</token>
+					<token name="BottomSurfaceInput">0</token>
+					<CoordinateFrame name="CFrame">
+						<X>0</X>
+						<Y>12.127285</Y>
+						<Z>0</Z>
+						<R00>0</R00>
+						<R01>0.699866295</R01>
+						<R02>-0.71427387</R02>
+						<R10>1</R10>
+						<R11>0</R11>
+						<R12>0</R12>
+						<R20>0</R20>
+						<R21>-0.71427387</R21>
+						<R22>-0.699866295</R22>
+					</CoordinateFrame>
+					<bool name="CanCollide">false</bool>
+					<bool name="CanQuery">true</bool>
+					<bool name="CanTouch">true</bool>
+					<bool name="CastShadow">false</bool>
+					<string name="CollisionGroup">Default</string>
+					<int name="CollisionGroupId">0</int>
+					<Color3uint8 name="Color3uint8">4289889366</Color3uint8>
+					<PhysicalProperties name="CustomPhysicalProperties">
+						<CustomPhysics>false</CustomPhysics>
+					</PhysicalProperties>
+					<bool name="EnableFluidForces">true</bool>
+					<float name="FrontParamA">-0.5</float>
+					<float name="FrontParamB">0.5</float>
+					<token name="FrontSurface">0</token>
+					<token name="FrontSurfaceInput">0</token>
+					<float name="LeftParamA">-0.5</float>
+					<float name="LeftParamB">0.5</float>
+					<token name="LeftSurface">0</token>
+					<token name="LeftSurfaceInput">0</token>
+					<bool name="Locked">false</bool>
+					<bool name="Massless">false</bool>
+					<token name="Material">272</token>
+					<string name="MaterialVariantSerialized"></string>
+					<CoordinateFrame name="PivotOffset">
+						<X>0</X>
+						<Y>0</Y>
+						<Z>0</Z>
+						<R00>1</R00>
+						<R01>0</R01>
+						<R02>0</R02>
+						<R10>0</R10>
+						<R11>1</R11>
+						<R12>0</R12>
+						<R20>0</R20>
+						<R21>0</R21>
+						<R22>1</R22>
+					</CoordinateFrame>
+					<float name="Reflectance">0</float>
+					<float name="RightParamA">-0.5</float>
+					<float name="RightParamB">0.5</float>
+					<token name="RightSurface">0</token>
+					<token name="RightSurfaceInput">0</token>
+					<int name="RootPriority">0</int>
+					<Vector3 name="RotVelocity">
+						<X>0</X>
+						<Y>0</Y>
+						<Z>0</Z>
+					</Vector3>
+					<float name="TopParamA">-0.5</float>
+					<float name="TopParamB">0.5</float>
+					<token name="TopSurface">0</token>
+					<token name="TopSurfaceInput">0</token>
+					<float name="Transparency">0</float>
+					<Vector3 name="Velocity">
+						<X>0</X>
+						<Y>0</Y>
+						<Z>0</Z>
+					</Vector3>
+					<Vector3 name="size">
+						<X>30.0532722</X>
+						<Y>24.25457</Y>
+						<Z>23.8860893</Z>
+					</Vector3>
+					<BinaryString name="AttributesSerialize"></BinaryString>
+					<SecurityCapabilities name="Capabilities">0</SecurityCapabilities>
+					<bool name="DefinesCapabilities">false</bool>
+					<UniqueId name="HistoryId">498d4c86fc87d5f70a4592c5000067ef</UniqueId>
+					<string name="Name">PalmMesh</string>
+					<int64 name="SourceAssetId">-1</int64>
+					<BinaryString name="Tags"></BinaryString>
+					<UniqueId name="UniqueId">498d4c86fc87d5f70a4592c500007ed9</UniqueId>
+				</Properties>
+			</Item>
+			<Item class="TrussPart" referent="RBXA6520E743C5B485C8C8B6D92000327CD">
+				<Properties>
+					<token name="style">0</token>
+					<bool name="Anchored">true</bool>
+					<bool name="AudioCanCollide">true</bool>
+					<float name="BackParamA">-0.5</float>
+					<float name="BackParamB">0.5</float>
+					<token name="BackSurface">5</token>
+					<token name="BackSurfaceInput">0</token>
+					<float name="BottomParamA">-0.5</float>
+					<float name="BottomParamB">0.5</float>
+					<token name="BottomSurface">5</token>
+					<token name="BottomSurfaceInput">0</token>
+					<CoordinateFrame name="CFrame">
+						<X>0</X>
+						<Y>10.9145565</Y>
+						<Z>0</Z>
+						<R00>1</R00>
+						<R01>0</R01>
+						<R02>0</R02>
+						<R10>0</R10>
+						<R11>1</R11>
+						<R12>0</R12>
+						<R20>0</R20>
+						<R21>0</R21>
+						<R22>1</R22>
+					</CoordinateFrame>
+					<bool name="CanCollide">true</bool>
+					<bool name="CanQuery">true</bool>
+					<bool name="CanTouch">true</bool>
+					<bool name="CastShadow">false</bool>
+					<string name="CollisionGroup">Default</string>
+					<int name="CollisionGroupId">0</int>
+					<Color3uint8 name="Color3uint8">4288914085</Color3uint8>
+					<PhysicalProperties name="CustomPhysicalProperties">
+						<CustomPhysics>false</CustomPhysics>
+					</PhysicalProperties>
+					<bool name="EnableFluidForces">true</bool>
+					<float name="FrontParamA">-0.5</float>
+					<float name="FrontParamB">0.5</float>
+					<token name="FrontSurface">5</token>
+					<token name="FrontSurfaceInput">0</token>
+					<float name="LeftParamA">-0.5</float>
+					<float name="LeftParamB">0.5</float>
+					<token name="LeftSurface">5</token>
+					<token name="LeftSurfaceInput">0</token>
+					<bool name="Locked">false</bool>
+					<bool name="Massless">false</bool>
+					<token name="Material">256</token>
+					<string name="MaterialVariantSerialized"></string>
+					<CoordinateFrame name="PivotOffset">
+						<X>0</X>
+						<Y>0</Y>
+						<Z>0</Z>
+						<R00>1</R00>
+						<R01>0</R01>
+						<R02>0</R02>
+						<R10>0</R10>
+						<R11>1</R11>
+						<R12>0</R12>
+						<R20>0</R20>
+						<R21>0</R21>
+						<R22>1</R22>
+					</CoordinateFrame>
+					<float name="Reflectance">0</float>
+					<float name="RightParamA">-0.5</float>
+					<float name="RightParamB">0.5</float>
+					<token name="RightSurface">5</token>
+					<token name="RightSurfaceInput">0</token>
+					<int name="RootPriority">0</int>
+					<Vector3 name="RotVelocity">
+						<X>0</X>
+						<Y>0</Y>
+						<Z>0</Z>
+					</Vector3>
+					<float name="TopParamA">-0.5</float>
+					<float name="TopParamB">0.5</float>
+					<token name="TopSurface">5</token>
+					<token name="TopSurfaceInput">0</token>
+					<float name="Transparency">1</float>
+					<Vector3 name="Velocity">
+						<X>0</X>
+						<Y>0</Y>
+						<Z>0</Z>
+					</Vector3>
+					<Vector3 name="size">
+						<X>2</X>
+						<Y>21.829113</Y>
+						<Z>2</Z>
+					</Vector3>
+					<BinaryString name="AttributesSerialize"></BinaryString>
+					<SecurityCapabilities name="Capabilities">0</SecurityCapabilities>
+					<bool name="DefinesCapabilities">false</bool>
+					<UniqueId name="HistoryId">498d4c86fc87d5f70a4592c500007898</UniqueId>
+					<string name="Name">ClimbTruss</string>
+					<int64 name="SourceAssetId">-1</int64>
+					<BinaryString name="Tags"></BinaryString>
+					<UniqueId name="UniqueId">498d4c86fc87d5f70a4592c500007eda</UniqueId>
+				</Properties>
+			</Item>
+			<Item class="Part" referent="RBXD9BA8B18064D4A6BBAA71B62D9947497">
+				<Properties>
+					<token name="shape">1</token>
+					<token name="formFactorRaw">1</token>
+					<bool name="Anchored">true</bool>
+					<bool name="AudioCanCollide">true</bool>
+					<float name="BackParamA">-0.5</float>
+					<float name="BackParamB">0.5</float>
+					<token name="BackSurface">0</token>
+					<token name="BackSurfaceInput">0</token>
+					<float name="BottomParamA">-0.5</float>
+					<float name="BottomParamB">0.5</float>
+					<token name="BottomSurface">4</token>
+					<token name="BottomSurfaceInput">0</token>
+					<CoordinateFrame name="CFrame">
+						<X>0</X>
+						<Y>21.829113</Y>
+						<Z>0</Z>
+						<R00>1</R00>
+						<R01>0</R01>
+						<R02>0</R02>
+						<R10>0</R10>
+						<R11>1</R11>
+						<R12>0</R12>
+						<R20>0</R20>
+						<R21>0</R21>
+						<R22>1</R22>
+					</CoordinateFrame>
+					<bool name="CanCollide">true</bool>
+					<bool name="CanQuery">true</bool>
+					<bool name="CanTouch">true</bool>
+					<bool name="CastShadow">false</bool>
+					<string name="CollisionGroup">Default</string>
+					<int name="CollisionGroupId">0</int>
+					<Color3uint8 name="Color3uint8">4288914085</Color3uint8>
+					<PhysicalProperties name="CustomPhysicalProperties">
+						<CustomPhysics>false</CustomPhysics>
+					</PhysicalProperties>
+					<bool name="EnableFluidForces">true</bool>
+					<float name="FrontParamA">-0.5</float>
+					<float name="FrontParamB">0.5</float>
+					<token name="FrontSurface">0</token>
+					<token name="FrontSurfaceInput">0</token>
+					<float name="LeftParamA">-0.5</float>
+					<float name="LeftParamB">0.5</float>
+					<token name="LeftSurface">0</token>
+					<token name="LeftSurfaceInput">0</token>
+					<bool name="Locked">false</bool>
+					<bool name="Massless">false</bool>
+					<token name="Material">256</token>
+					<string name="MaterialVariantSerialized"></string>
+					<CoordinateFrame name="PivotOffset">
+						<X>0</X>
+						<Y>0</Y>
+						<Z>0</Z>
+						<R00>1</R00>
+						<R01>0</R01>
+						<R02>0</R02>
+						<R10>0</R10>
+						<R11>1</R11>
+						<R12>0</R12>
+						<R20>0</R20>
+						<R21>0</R21>
+						<R22>1</R22>
+					</CoordinateFrame>
+					<float name="Reflectance">0</float>
+					<float name="RightParamA">-0.5</float>
+					<float name="RightParamB">0.5</float>
+					<token name="RightSurface">0</token>
+					<token name="RightSurfaceInput">0</token>
+					<int name="RootPriority">0</int>
+					<Vector3 name="RotVelocity">
+						<X>0</X>
+						<Y>0</Y>
+						<Z>0</Z>
+					</Vector3>
+					<float name="TopParamA">-0.5</float>
+					<float name="TopParamB">0.5</float>
+					<token name="TopSurface">3</token>
+					<token name="TopSurfaceInput">0</token>
+					<float name="Transparency">1</float>
+					<Vector3 name="Velocity">
+						<X>0</X>
+						<Y>0</Y>
+						<Z>0</Z>
+					</Vector3>
+					<Vector3 name="size">
+						<X>3</X>
+						<Y>1</Y>
+						<Z>3</Z>
+					</Vector3>
+					<BinaryString name="AttributesSerialize"></BinaryString>
+					<SecurityCapabilities name="Capabilities">0</SecurityCapabilities>
+					<bool name="DefinesCapabilities">false</bool>
+					<UniqueId name="HistoryId">498d4c86fc87d5f70a4592c500007899</UniqueId>
+					<string name="Name">TopCap</string>
+					<int64 name="SourceAssetId">-1</int64>
+					<BinaryString name="Tags"></BinaryString>
+					<UniqueId name="UniqueId">498d4c86fc87d5f70a4592c500007edb</UniqueId>
+				</Properties>
+			</Item>
 		</Item>
 	</Item>
 	<Item class="ServiceVisibilityService" referent="RBX0B720DDE876944DB8448223293B41E99">
