@@ -1,0 +1,133 @@
+-- WaveManager: Phase 1 + 4 - Enemy Spawning & Wave Progression
+local ServerStorage = game:GetService("ServerStorage")
+local Players = game:GetService("Players")
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+
+local WAVE_PAUSE = 5
+local BASE_ENEMIES = 5
+local ENEMIES_PER_WAVE = 3
+local SPAWN_RADIUS = 30
+local WAVE_CLEAR_TIMEOUT = 60
+
+local currentWave = 0
+local waveActive = false
+local activeEnemies = 0
+local waveCleared = Instance.new("BindableEvent")
+
+local waveInfoEvent = ReplicatedStorage:FindFirstChild("WaveInfo")
+if not waveInfoEvent then
+	waveInfoEvent = Instance.new("RemoteEvent")
+	waveInfoEvent.Name = "WaveInfo"
+	waveInfoEvent.Parent = ReplicatedStorage
+end
+
+local function broadcastWave(waveNumber: number)
+	waveInfoEvent:FireAllClients("Wave", waveNumber)
+end
+
+local function getSpawnPosition(center: Vector3): Vector3
+	local angle = math.random() * 2 * math.pi
+	return Vector3.new(
+		center.X + math.cos(angle) * SPAWN_RADIUS,
+		center.Y + 5,
+		center.Z + math.sin(angle) * SPAWN_RADIUS
+	)
+end
+
+local function getRandomPlayerPosition(): Vector3
+	local positions = {}
+	for _, player in ipairs(Players:GetPlayers()) do
+		if player.Character and player.Character:FindFirstChild("HumanoidRootPart") then
+			table.insert(positions, player.Character.HumanoidRootPart.Position)
+		end
+	end
+	return #positions > 0 and positions[math.random(#positions)] or Vector3.new(0, 5, 0)
+end
+
+local function spawnEnemy(spawnPos: Vector3)
+	local enemyTemplate = ServerStorage:FindFirstChild("EnemyTemplate")
+	if not enemyTemplate then
+		warn("[WaveManager] EnemyTemplate missing!")
+		return
+	end
+	local enemy = enemyTemplate:Clone()
+	enemy.Name = "Enemy"
+	enemy.Parent = workspace
+	if enemy.PrimaryPart then
+		enemy:SetPrimaryPartCFrame(CFrame.new(spawnPos))
+	end
+	activeEnemies += 1
+	local humanoid = enemy:FindFirstChildOfClass("Humanoid")
+	if humanoid then
+		humanoid.Died:Connect(function()
+			activeEnemies -= 1
+			if activeEnemies <= 0 and waveActive then
+				waveCleared:Fire()
+			end
+		end)
+	end
+end
+
+local function spawnWave(waveNumber: number)
+	local count = BASE_ENEMIES + (waveNumber - 1) * ENEMIES_PER_WAVE
+	print(string.format("[WaveManager] Wave %d — spawning %d enemies", waveNumber, count))
+	activeEnemies = 0
+	for _ = 1, count do
+		spawnEnemy(getSpawnPosition(getRandomPlayerPosition()))
+		task.wait(0.2)
+	end
+end
+
+local function clearEnemies()
+	for _, obj in ipairs(workspace:GetChildren()) do
+		if obj.Name == "Enemy" then obj:Destroy() end
+	end
+	activeEnemies = 0
+end
+
+local function waitForWaveClear()
+	if activeEnemies <= 0 then return end
+	local cleared = false
+	local conn = waveCleared.Event:Connect(function() cleared = true end)
+	local elapsed = 0
+	while not cleared and elapsed < WAVE_CLEAR_TIMEOUT do
+		task.wait(1)
+		elapsed += 1
+	end
+	conn:Disconnect()
+	if not cleared then
+		warn(string.format("[WaveManager] Wave %d timed out", currentWave))
+	end
+end
+
+local function livingPlayerCount(): number
+	local count = 0
+	for _, player in ipairs(Players:GetPlayers()) do
+		local char = player.Character
+		if not char then continue end
+		local hum = char:FindFirstChildOfClass("Humanoid")
+		if hum and hum.Health > 0 and not char:FindFirstChild("Spectator") then
+			count += 1
+		end
+	end
+	return count
+end
+
+task.delay(3, function()
+	while true do
+		repeat task.wait(1) until livingPlayerCount() > 0
+		currentWave += 1
+		waveActive = true
+		print(string.format("[WaveManager] === WAVE %d ===", currentWave))
+		broadcastWave(currentWave)
+		spawnWave(currentWave)
+		waitForWaveClear()
+		waveActive = false
+		clearEnemies()
+		print(string.format("[WaveManager] Wave %d cleared! Next in %ds.", currentWave, WAVE_PAUSE))
+		broadcastWave(0)
+		task.wait(WAVE_PAUSE)
+	end
+end)
+
+print("[WaveManager] Loaded.")

@@ -109,27 +109,27 @@
 		<Item class="Camera" referent="RBXAA22F8B3411843AFACFD394AD21A8B1C">
 			<Properties>
 				<CoordinateFrame name="CFrame">
-					<X>-41.169178</X>
-					<Y>31.4639835</Y>
-					<Z>5.07141733</Z>
-					<R00>0.241916761</R00>
-					<R01>0.541178823</R01>
-					<R02>-0.805358231</R02>
-					<R10>-0</R10>
-					<R11>0.830012143</R11>
-					<R12>0.557745457</R12>
-					<R20>0.970297098</R20>
-					<R21>-0.134927973</R21>
-					<R22>0.200793818</R22>
+					<X>-69.6285858</X>
+					<Y>36.399868</Y>
+					<Z>13.2682896</Z>
+					<R00>-0.00698568858</R00>
+					<R01>0.430501908</R01>
+					<R02>-0.902562678</R02>
+					<R10>2.32830671e-10</R10>
+					<R11>0.902584791</R11>
+					<R12>0.430512369</R12>
+					<R20>0.999975681</R20>
+					<R21>0.003007425</R21>
+					<R22>-0.0063051749</R22>
 				</CoordinateFrame>
 				<Ref name="CameraSubject">null</Ref>
 				<token name="CameraType">0</token>
 				<float name="FieldOfView">70</float>
 				<token name="FieldOfViewMode">0</token>
 				<CoordinateFrame name="Focus">
-					<X>-39.5584602</X>
-					<Y>30.3484917</Y>
-					<Z>4.66982937</Z>
+					<X>-67.8234482</X>
+					<Y>35.5388374</Y>
+					<Z>13.2809</Z>
 					<R00>1</R00>
 					<R01>0</R01>
 					<R02>0</R02>
@@ -1253,9 +1253,9 @@ zNLfaoZA///+//PAj5CH]]></BinaryString>
 					<BinaryString name="Tags"></BinaryString>
 					<UniqueId name="UniqueId">59f334f572a46a2c0a430089000008d4</UniqueId>
 				</Properties>
-				<Item class="LocalScript" referent="RBXA74A0C4B38DA4D02A2C335C09C60F360">
+				<Item class="LocalScript" referent="RBXC0C3379D81D840AC8CE2087D1B76F05A">
 					<Properties>
-						<ProtectedString name="Source"><![CDATA[-- SpectatorClient: Phase 6 - Client-side fly mode for spectators
+						<ProtectedString name="Source"><![CDATA[-- SpectatorClient: Phase 6 - Ghost fly mode
 local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local UserInputService = game:GetService("UserInputService")
@@ -1266,16 +1266,19 @@ local spectatorEvent = ReplicatedStorage:WaitForChild("SpectatorEvent")
 
 local isSpectating = false
 local flyConnection = nil
-local bodyVelocity = nil
-local bodyGyro = nil
-
+local linearVelocity = nil
+local alignOrientation = nil
+local hrpAttachment = nil
+local camAttachment = nil
 local FLY_SPEED = 40
 
 local function stopFlying()
 	isSpectating = false
 	if flyConnection then flyConnection:Disconnect() flyConnection = nil end
-	if bodyVelocity then bodyVelocity:Destroy() bodyVelocity = nil end
-	if bodyGyro then bodyGyro:Destroy() bodyGyro = nil end
+	if linearVelocity then linearVelocity:Destroy() linearVelocity = nil end
+	if alignOrientation then alignOrientation:Destroy() alignOrientation = nil end
+	if hrpAttachment then hrpAttachment:Destroy() hrpAttachment = nil end
+	if camAttachment then camAttachment:Destroy() camAttachment = nil end
 end
 
 local function startFlying()
@@ -1283,23 +1286,49 @@ local function startFlying()
 	if not character then return end
 	local hrp = character:FindFirstChild("HumanoidRootPart")
 	if not hrp then return end
+
+	-- Kill humanoid movement
 	local humanoid = character:FindFirstChildOfClass("Humanoid")
 	if humanoid then
-		humanoid.PlatformStand = true -- disable default movement
+		humanoid.PlatformStand = true
+		humanoid.AutoRotate = false
+		humanoid.WalkSpeed = 0
+		humanoid.JumpPower = 0
 	end
 
-	-- BodyVelocity for movement
-	bodyVelocity = Instance.new("BodyVelocity")
-	bodyVelocity.Velocity = Vector3.zero
-	bodyVelocity.MaxForce = Vector3.new(1e5, 1e5, 1e5)
-	bodyVelocity.Parent = hrp
+	-- Unanchor HRP only so LinearVelocity can move it
+	-- All other parts stay anchored so the body stays frozen on the ground
+	hrp.Anchored = false
+	hrp.AssemblyLinearVelocity = Vector3.zero
+	hrp.AssemblyAngularVelocity = Vector3.zero
 
-	-- BodyGyro to keep upright
-	bodyGyro = Instance.new("BodyGyro")
-	bodyGyro.MaxTorque = Vector3.new(1e5, 1e5, 1e5)
-	bodyGyro.P = 1e4
-	bodyGyro.CFrame = hrp.CFrame
-	bodyGyro.Parent = hrp
+	-- Attachment on HRP for constraints
+	hrpAttachment = Instance.new("Attachment")
+	hrpAttachment.Name = "SpectatorAttachment"
+	hrpAttachment.Parent = hrp
+
+	-- Camera attachment in Terrain for AlignOrientation reference
+	camAttachment = Instance.new("Attachment")
+	camAttachment.Name = "CamAttachment"
+	camAttachment.Parent = workspace.Terrain
+
+	-- LinearVelocity: MaxForce = huge so gravity has zero effect
+	linearVelocity = Instance.new("LinearVelocity")
+	linearVelocity.Attachment0 = hrpAttachment
+	linearVelocity.MaxForce = math.huge
+	linearVelocity.VelocityConstraintMode = Enum.VelocityConstraintMode.Vector
+	linearVelocity.VectorVelocity = Vector3.zero
+	linearVelocity.RelativeTo = Enum.ActuatorRelativeTo.World
+	linearVelocity.Parent = hrp
+
+	-- AlignOrientation: keep HRP facing camera direction
+	alignOrientation = Instance.new("AlignOrientation")
+	alignOrientation.Attachment0 = hrpAttachment
+	alignOrientation.Attachment1 = camAttachment
+	alignOrientation.MaxTorque = math.huge
+	alignOrientation.MaxAngularVelocity = math.huge
+	alignOrientation.Responsiveness = 200
+	alignOrientation.Parent = hrp
 
 	isSpectating = true
 
@@ -1313,18 +1342,10 @@ local function startFlying()
 		local camera = workspace.CurrentCamera
 		local moveDir = Vector3.zero
 
-		if UserInputService:IsKeyDown(Enum.KeyCode.W) then
-			moveDir += camera.CFrame.LookVector
-		end
-		if UserInputService:IsKeyDown(Enum.KeyCode.S) then
-			moveDir -= camera.CFrame.LookVector
-		end
-		if UserInputService:IsKeyDown(Enum.KeyCode.A) then
-			moveDir -= camera.CFrame.RightVector
-		end
-		if UserInputService:IsKeyDown(Enum.KeyCode.D) then
-			moveDir += camera.CFrame.RightVector
-		end
+		if UserInputService:IsKeyDown(Enum.KeyCode.W) then moveDir += camera.CFrame.LookVector end
+		if UserInputService:IsKeyDown(Enum.KeyCode.S) then moveDir -= camera.CFrame.LookVector end
+		if UserInputService:IsKeyDown(Enum.KeyCode.A) then moveDir -= camera.CFrame.RightVector end
+		if UserInputService:IsKeyDown(Enum.KeyCode.D) then moveDir += camera.CFrame.RightVector end
 		if UserInputService:IsKeyDown(Enum.KeyCode.E) or UserInputService:IsKeyDown(Enum.KeyCode.Space) then
 			moveDir += Vector3.new(0, 1, 0)
 		end
@@ -1332,38 +1353,32 @@ local function startFlying()
 			moveDir -= Vector3.new(0, 1, 0)
 		end
 
-		if moveDir.Magnitude > 0 then
-			moveDir = moveDir.Unit
-		end
-
-		if bodyVelocity then
-			bodyVelocity.Velocity = moveDir * FLY_SPEED
-		end
-		if bodyGyro then
-			bodyGyro.CFrame = camera.CFrame
-		end
+		if moveDir.Magnitude > 0 then moveDir = moveDir.Unit end
+		linearVelocity.VectorVelocity = moveDir * FLY_SPEED
+		camAttachment.WorldCFrame = camera.CFrame
 	end)
 end
 
--- Listen for server telling us to start spectating
 spectatorEvent.OnClientEvent:Connect(function(action: string)
 	if action == "StartSpectator" then
-		task.wait(0.5) -- wait for ghost appearance to apply
+		task.wait(0.3)
 		startFlying()
 	end
 end)
 
--- Stop flying when character respawns
 player.CharacterAdded:Connect(function()
 	stopFlying()
 end)
 
 print("[SpectatorClient] Loaded.")
+
+
+
 ]]></ProtectedString>
 						<bool name="Disabled">false</bool>
 						<Content name="LinkedSource"><null></null></Content>
 						<token name="RunContext">0</token>
-						<string name="ScriptGuid">{DDD1BCBA-BC52-4BBE-A764-37F8BB96A911}</string>
+						<string name="ScriptGuid">{26F83EA5-5AB6-4659-B8B5-FD92D5771B5A}</string>
 						<BinaryString name="AttributesSerialize"></BinaryString>
 						<SecurityCapabilities name="Capabilities">0</SecurityCapabilities>
 						<bool name="DefinesCapabilities">false</bool>
@@ -1371,7 +1386,7 @@ print("[SpectatorClient] Loaded.")
 						<string name="Name">SpectatorClient</string>
 						<int64 name="SourceAssetId">-1</int64>
 						<BinaryString name="Tags"></BinaryString>
-						<UniqueId name="UniqueId">3783a5e21b3f4aae0a44646d00000fe0</UniqueId>
+						<UniqueId name="UniqueId">779da0f573a2aa250a44959300001b1c</UniqueId>
 					</Properties>
 				</Item>
 			</Item>
@@ -1683,6 +1698,48 @@ print("[LaserGun] LocalScript loaded.")
 				</Properties>
 			</Item>
 		</Item>
+		<Item class="Folder" referent="RBX4A86094179FA4DC59011555FA25012D1">
+			<Properties>
+				<BinaryString name="AttributesSerialize"></BinaryString>
+				<SecurityCapabilities name="Capabilities">0</SecurityCapabilities>
+				<bool name="DefinesCapabilities">false</bool>
+				<UniqueId name="HistoryId">00000000000000000000000000000000</UniqueId>
+				<string name="Name">LaserGun</string>
+				<int64 name="SourceAssetId">-1</int64>
+				<BinaryString name="Tags"></BinaryString>
+				<UniqueId name="UniqueId">779da0f573a2aa250a449593000019c2</UniqueId>
+			</Properties>
+			<Item class="Folder" referent="RBX07C0472F9450427BB1819D8D1F1B83F3">
+				<Properties>
+					<BinaryString name="AttributesSerialize"></BinaryString>
+					<SecurityCapabilities name="Capabilities">0</SecurityCapabilities>
+					<bool name="DefinesCapabilities">false</bool>
+					<UniqueId name="HistoryId">00000000000000000000000000000000</UniqueId>
+					<string name="Name">Handle</string>
+					<int64 name="SourceAssetId">-1</int64>
+					<BinaryString name="Tags"></BinaryString>
+					<UniqueId name="UniqueId">779da0f573a2aa250a449593000019c3</UniqueId>
+				</Properties>
+			</Item>
+			<Item class="ModuleScript" referent="RBX3AE05ABA15F44BCD99B9EC481D7502BF">
+				<Properties>
+					<Content name="LinkedSource"><null></null></Content>
+					<ProtectedString name="Source"><![CDATA[return {
+	RequiresHandle = true,
+	ToolTip = "Laser Gun — 2 shots kill",
+}]]></ProtectedString>
+					<string name="ScriptGuid">{D1509561-5BC8-4617-A5F9-E212FABF29A1}</string>
+					<BinaryString name="AttributesSerialize"></BinaryString>
+					<SecurityCapabilities name="Capabilities">0</SecurityCapabilities>
+					<bool name="DefinesCapabilities">false</bool>
+					<UniqueId name="HistoryId">00000000000000000000000000000000</UniqueId>
+					<string name="Name">init.tool</string>
+					<int64 name="SourceAssetId">-1</int64>
+					<BinaryString name="Tags"></BinaryString>
+					<UniqueId name="UniqueId">779da0f573a2aa250a449593000019c4</UniqueId>
+				</Properties>
+			</Item>
+		</Item>
 	</Item>
 	<Item class="StarterGui" referent="RBXFC313C5D084447E8B8664CE0992E53E3">
 		<Properties>
@@ -1703,7 +1760,7 @@ print("[LaserGun] LocalScript loaded.")
 			<BinaryString name="Tags"></BinaryString>
 			<UniqueId name="UniqueId">6bf9652ea5737aa20a421a9800000360</UniqueId>
 		</Properties>
-		<Item class="ScreenGui" referent="RBXED6542AA5C674A41A8356DFD21D94655">
+		<Item class="ScreenGui" referent="RBXFBBD961FBE364D6CAB94FA0A69CB2057">
 			<Properties>
 				<bool name="ClipToDeviceSafeArea">true</bool>
 				<int name="DisplayOrder">0</int>
@@ -1726,9 +1783,9 @@ print("[LaserGun] LocalScript loaded.")
 				<string name="Name">HUD</string>
 				<int64 name="SourceAssetId">-1</int64>
 				<BinaryString name="Tags"></BinaryString>
-				<UniqueId name="UniqueId">3783a5e21b3f4aae0a44646d00000c1e</UniqueId>
+				<UniqueId name="UniqueId">779da0f573a2aa250a44959300002ea5</UniqueId>
 			</Properties>
-			<Item class="Frame" referent="RBXA2F3D304B2644C86BC169FEB0129C0AB">
+			<Item class="Frame" referent="RBXC4115D4FD97948CEA3F1FBE981792A25">
 				<Properties>
 					<token name="Style">0</token>
 					<bool name="Active">false</bool>
@@ -1792,9 +1849,9 @@ print("[LaserGun] LocalScript loaded.")
 					<string name="Name">WaveFrame</string>
 					<int64 name="SourceAssetId">-1</int64>
 					<BinaryString name="Tags"></BinaryString>
-					<UniqueId name="UniqueId">3783a5e21b3f4aae0a44646d00000c1f</UniqueId>
+					<UniqueId name="UniqueId">779da0f573a2aa250a44959300002ea6</UniqueId>
 				</Properties>
-				<Item class="UICorner" referent="RBX9AF4BE132CDD41BCB8386C8DC4A90753">
+				<Item class="UICorner" referent="RBXB73FFFE903AD45169426FC6955804FE9">
 					<Properties>
 						<UDim name="BottomLeftRadius">
 							<S>0</S>
@@ -1819,10 +1876,10 @@ print("[LaserGun] LocalScript loaded.")
 						<string name="Name">UICorner</string>
 						<int64 name="SourceAssetId">-1</int64>
 						<BinaryString name="Tags"></BinaryString>
-						<UniqueId name="UniqueId">3783a5e21b3f4aae0a44646d00000c20</UniqueId>
+						<UniqueId name="UniqueId">779da0f573a2aa250a44959300002ea7</UniqueId>
 					</Properties>
 				</Item>
-				<Item class="TextLabel" referent="RBX9102F6CA6DBE4752A482D051464636E9">
+				<Item class="TextLabel" referent="RBXD93E4539AA734E32A35F42E02DE3C220">
 					<Properties>
 						<Font name="FontFace">
 							<Family><url>rbxasset://fonts/families/GothamSSm.json</url></Family>
@@ -1917,11 +1974,11 @@ print("[LaserGun] LocalScript loaded.")
 						<string name="Name">WaveLabel</string>
 						<int64 name="SourceAssetId">-1</int64>
 						<BinaryString name="Tags"></BinaryString>
-						<UniqueId name="UniqueId">3783a5e21b3f4aae0a44646d00000c21</UniqueId>
+						<UniqueId name="UniqueId">779da0f573a2aa250a44959300002ea8</UniqueId>
 					</Properties>
 				</Item>
 			</Item>
-			<Item class="Frame" referent="RBX6D65F8BB9185487E8FE489568C9834DC">
+			<Item class="Frame" referent="RBX04BF3E01E1C1481C9CE6B7A45A4053CD">
 				<Properties>
 					<token name="Style">0</token>
 					<bool name="Active">false</bool>
@@ -1985,9 +2042,9 @@ print("[LaserGun] LocalScript loaded.")
 					<string name="Name">KillFrame</string>
 					<int64 name="SourceAssetId">-1</int64>
 					<BinaryString name="Tags"></BinaryString>
-					<UniqueId name="UniqueId">3783a5e21b3f4aae0a44646d00000c22</UniqueId>
+					<UniqueId name="UniqueId">779da0f573a2aa250a44959300002ea9</UniqueId>
 				</Properties>
-				<Item class="UICorner" referent="RBX75C8866802F94F379CA31C68150345FE">
+				<Item class="UICorner" referent="RBX3CF8284C887345969E4D07407F235A70">
 					<Properties>
 						<UDim name="BottomLeftRadius">
 							<S>0</S>
@@ -2012,10 +2069,10 @@ print("[LaserGun] LocalScript loaded.")
 						<string name="Name">UICorner</string>
 						<int64 name="SourceAssetId">-1</int64>
 						<BinaryString name="Tags"></BinaryString>
-						<UniqueId name="UniqueId">3783a5e21b3f4aae0a44646d00000c23</UniqueId>
+						<UniqueId name="UniqueId">779da0f573a2aa250a44959300002eaa</UniqueId>
 					</Properties>
 				</Item>
-				<Item class="TextLabel" referent="RBXE2F7701DC7314D2AAB9AE192953439FF">
+				<Item class="TextLabel" referent="RBXC4D765A530474B17B56EE9DB46E6C880">
 					<Properties>
 						<Font name="FontFace">
 							<Family><url>rbxasset://fonts/families/GothamSSm.json</url></Family>
@@ -2110,274 +2167,11 @@ print("[LaserGun] LocalScript loaded.")
 						<string name="Name">KillLabel</string>
 						<int64 name="SourceAssetId">-1</int64>
 						<BinaryString name="Tags"></BinaryString>
-						<UniqueId name="UniqueId">3783a5e21b3f4aae0a44646d00000c24</UniqueId>
+						<UniqueId name="UniqueId">779da0f573a2aa250a44959300002eab</UniqueId>
 					</Properties>
 				</Item>
 			</Item>
-			<Item class="Frame" referent="RBX6A0F40A68DD54D5C80D213EB4362F1C5">
-				<Properties>
-					<token name="Style">0</token>
-					<bool name="Active">false</bool>
-					<Vector2 name="AnchorPoint">
-						<X>0</X>
-						<Y>0</Y>
-					</Vector2>
-					<token name="AutomaticSize">0</token>
-					<Color3 name="BackgroundColor3">
-						<R>0</R>
-						<G>0</G>
-						<B>0</B>
-					</Color3>
-					<float name="BackgroundTransparency">1</float>
-					<Color3 name="BorderColor3">
-						<R>0.105882354</R>
-						<G>0.164705887</G>
-						<B>0.20784314</B>
-					</Color3>
-					<token name="BorderMode">0</token>
-					<int name="BorderSizePixel">0</int>
-					<bool name="ClipsDescendants">false</bool>
-					<bool name="Draggable">false</bool>
-					<token name="InputSink">0</token>
-					<bool name="Interactable">true</bool>
-					<int name="LayoutOrder">0</int>
-					<Ref name="NextSelectionDown">null</Ref>
-					<Ref name="NextSelectionLeft">null</Ref>
-					<Ref name="NextSelectionRight">null</Ref>
-					<Ref name="NextSelectionUp">null</Ref>
-					<UDim2 name="Position">
-						<XS>0</XS>
-						<XO>0</XO>
-						<YS>0</YS>
-						<YO>0</YO>
-					</UDim2>
-					<float name="Rotation">0</float>
-					<bool name="Selectable">false</bool>
-					<Ref name="SelectionImageObject">null</Ref>
-					<int name="SelectionOrder">0</int>
-					<UDim2 name="Size">
-						<XS>1</XS>
-						<XO>0</XO>
-						<YS>1</YS>
-						<YO>0</YO>
-					</UDim2>
-					<token name="SizeConstraint">0</token>
-					<bool name="Visible">false</bool>
-					<int name="ZIndex">10</int>
-					<bool name="AutoLocalize">true</bool>
-					<Ref name="RootLocalizationTable">null</Ref>
-					<token name="SelectionBehaviorDown">0</token>
-					<token name="SelectionBehaviorLeft">0</token>
-					<token name="SelectionBehaviorRight">0</token>
-					<token name="SelectionBehaviorUp">0</token>
-					<bool name="SelectionGroup">false</bool>
-					<BinaryString name="AttributesSerialize"></BinaryString>
-					<SecurityCapabilities name="Capabilities">0</SecurityCapabilities>
-					<bool name="DefinesCapabilities">false</bool>
-					<UniqueId name="HistoryId">00000000000000000000000000000000</UniqueId>
-					<string name="Name">DiedFrame</string>
-					<int64 name="SourceAssetId">-1</int64>
-					<BinaryString name="Tags"></BinaryString>
-					<UniqueId name="UniqueId">3783a5e21b3f4aae0a44646d00000c25</UniqueId>
-				</Properties>
-				<Item class="TextLabel" referent="RBX27B8151B334E457E99D43F7E63854138">
-					<Properties>
-						<Font name="FontFace">
-							<Family><url>rbxasset://fonts/families/GothamSSm.json</url></Family>
-							<Weight>700</Weight>
-							<Style>Normal</Style>
-							<CachedFaceId><url>rbxasset://fonts/Montserrat-Bold.ttf</url></CachedFaceId>
-						</Font>
-						<float name="LineHeight">1</float>
-						<string name="LocalizationMatchIdentifier"></string>
-						<string name="LocalizationMatchedSourceText"></string>
-						<int name="MaxVisibleGraphemes">-1</int>
-						<string name="OpenTypeFeatures"></string>
-						<bool name="RichText">false</bool>
-						<string name="Text">YOU DIED</string>
-						<Color3 name="TextColor3">
-							<R>0.862745106</R>
-							<G>0.117647059</G>
-							<B>0.117647059</B>
-						</Color3>
-						<token name="TextDirection">0</token>
-						<bool name="TextScaled">true</bool>
-						<float name="TextSize">8</float>
-						<Color3 name="TextStrokeColor3">
-							<R>0</R>
-							<G>0</G>
-							<B>0</B>
-						</Color3>
-						<float name="TextStrokeTransparency">1</float>
-						<float name="TextTransparency">0</float>
-						<token name="TextTruncate">0</token>
-						<bool name="TextWrapped">true</bool>
-						<token name="TextXAlignment">2</token>
-						<token name="TextYAlignment">1</token>
-						<bool name="Active">false</bool>
-						<Vector2 name="AnchorPoint">
-							<X>0</X>
-							<Y>0</Y>
-						</Vector2>
-						<token name="AutomaticSize">0</token>
-						<Color3 name="BackgroundColor3">
-							<R>0.639215708</R>
-							<G>0.635294139</G>
-							<B>0.647058845</B>
-						</Color3>
-						<float name="BackgroundTransparency">1</float>
-						<Color3 name="BorderColor3">
-							<R>0.105882354</R>
-							<G>0.164705887</G>
-							<B>0.20784314</B>
-						</Color3>
-						<token name="BorderMode">0</token>
-						<int name="BorderSizePixel">1</int>
-						<bool name="ClipsDescendants">false</bool>
-						<bool name="Draggable">false</bool>
-						<token name="InputSink">0</token>
-						<bool name="Interactable">true</bool>
-						<int name="LayoutOrder">0</int>
-						<Ref name="NextSelectionDown">null</Ref>
-						<Ref name="NextSelectionLeft">null</Ref>
-						<Ref name="NextSelectionRight">null</Ref>
-						<Ref name="NextSelectionUp">null</Ref>
-						<UDim2 name="Position">
-							<XS>0.5</XS>
-							<XO>-200</XO>
-							<YS>0.400000006</YS>
-							<YO>0</YO>
-						</UDim2>
-						<float name="Rotation">0</float>
-						<bool name="Selectable">false</bool>
-						<Ref name="SelectionImageObject">null</Ref>
-						<int name="SelectionOrder">0</int>
-						<UDim2 name="Size">
-							<XS>0</XS>
-							<XO>400</XO>
-							<YS>0</YS>
-							<YO>100</YO>
-						</UDim2>
-						<token name="SizeConstraint">0</token>
-						<bool name="Visible">true</bool>
-						<int name="ZIndex">11</int>
-						<bool name="AutoLocalize">true</bool>
-						<Ref name="RootLocalizationTable">null</Ref>
-						<token name="SelectionBehaviorDown">0</token>
-						<token name="SelectionBehaviorLeft">0</token>
-						<token name="SelectionBehaviorRight">0</token>
-						<token name="SelectionBehaviorUp">0</token>
-						<bool name="SelectionGroup">false</bool>
-						<BinaryString name="AttributesSerialize"></BinaryString>
-						<SecurityCapabilities name="Capabilities">0</SecurityCapabilities>
-						<bool name="DefinesCapabilities">false</bool>
-						<UniqueId name="HistoryId">00000000000000000000000000000000</UniqueId>
-						<string name="Name">DiedLabel</string>
-						<int64 name="SourceAssetId">-1</int64>
-						<BinaryString name="Tags"></BinaryString>
-						<UniqueId name="UniqueId">3783a5e21b3f4aae0a44646d00000c26</UniqueId>
-					</Properties>
-				</Item>
-				<Item class="TextLabel" referent="RBX3F7F6161BF1F467F984C63CFBCDB956A">
-					<Properties>
-						<Font name="FontFace">
-							<Family><url>rbxasset://fonts/families/GothamSSm.json</url></Family>
-							<Weight>400</Weight>
-							<Style>Normal</Style>
-							<CachedFaceId><url>rbxasset://fonts/Montserrat-Regular.ttf</url></CachedFaceId>
-						</Font>
-						<float name="LineHeight">1</float>
-						<string name="LocalizationMatchIdentifier"></string>
-						<string name="LocalizationMatchedSourceText"></string>
-						<int name="MaxVisibleGraphemes">-1</int>
-						<string name="OpenTypeFeatures"></string>
-						<bool name="RichText">false</bool>
-						<string name="Text">Spectating...</string>
-						<Color3 name="TextColor3">
-							<R>0.784313738</R>
-							<G>0.784313738</G>
-							<B>0.784313738</B>
-						</Color3>
-						<token name="TextDirection">0</token>
-						<bool name="TextScaled">true</bool>
-						<float name="TextSize">8</float>
-						<Color3 name="TextStrokeColor3">
-							<R>0</R>
-							<G>0</G>
-							<B>0</B>
-						</Color3>
-						<float name="TextStrokeTransparency">1</float>
-						<float name="TextTransparency">0</float>
-						<token name="TextTruncate">0</token>
-						<bool name="TextWrapped">true</bool>
-						<token name="TextXAlignment">2</token>
-						<token name="TextYAlignment">1</token>
-						<bool name="Active">false</bool>
-						<Vector2 name="AnchorPoint">
-							<X>0</X>
-							<Y>0</Y>
-						</Vector2>
-						<token name="AutomaticSize">0</token>
-						<Color3 name="BackgroundColor3">
-							<R>0.639215708</R>
-							<G>0.635294139</G>
-							<B>0.647058845</B>
-						</Color3>
-						<float name="BackgroundTransparency">1</float>
-						<Color3 name="BorderColor3">
-							<R>0.105882354</R>
-							<G>0.164705887</G>
-							<B>0.20784314</B>
-						</Color3>
-						<token name="BorderMode">0</token>
-						<int name="BorderSizePixel">1</int>
-						<bool name="ClipsDescendants">false</bool>
-						<bool name="Draggable">false</bool>
-						<token name="InputSink">0</token>
-						<bool name="Interactable">true</bool>
-						<int name="LayoutOrder">0</int>
-						<Ref name="NextSelectionDown">null</Ref>
-						<Ref name="NextSelectionLeft">null</Ref>
-						<Ref name="NextSelectionRight">null</Ref>
-						<Ref name="NextSelectionUp">null</Ref>
-						<UDim2 name="Position">
-							<XS>0.5</XS>
-							<XO>-200</XO>
-							<YS>0.550000012</YS>
-							<YO>0</YO>
-						</UDim2>
-						<float name="Rotation">0</float>
-						<bool name="Selectable">false</bool>
-						<Ref name="SelectionImageObject">null</Ref>
-						<int name="SelectionOrder">0</int>
-						<UDim2 name="Size">
-							<XS>0</XS>
-							<XO>400</XO>
-							<YS>0</YS>
-							<YO>40</YO>
-						</UDim2>
-						<token name="SizeConstraint">0</token>
-						<bool name="Visible">false</bool>
-						<int name="ZIndex">11</int>
-						<bool name="AutoLocalize">true</bool>
-						<Ref name="RootLocalizationTable">null</Ref>
-						<token name="SelectionBehaviorDown">0</token>
-						<token name="SelectionBehaviorLeft">0</token>
-						<token name="SelectionBehaviorRight">0</token>
-						<token name="SelectionBehaviorUp">0</token>
-						<bool name="SelectionGroup">false</bool>
-						<BinaryString name="AttributesSerialize"></BinaryString>
-						<SecurityCapabilities name="Capabilities">0</SecurityCapabilities>
-						<bool name="DefinesCapabilities">false</bool>
-						<UniqueId name="HistoryId">00000000000000000000000000000000</UniqueId>
-						<string name="Name">SpectatorLabel</string>
-						<int64 name="SourceAssetId">-1</int64>
-						<BinaryString name="Tags"></BinaryString>
-						<UniqueId name="UniqueId">3783a5e21b3f4aae0a44646d00000c27</UniqueId>
-					</Properties>
-				</Item>
-			</Item>
-			<Item class="Frame" referent="RBX5AC2453E93B146CE96F7994784E7DC9E">
+			<Item class="Frame" referent="RBX3E9E3D48297E424EBBE957C553415931">
 				<Properties>
 					<token name="Style">0</token>
 					<bool name="Active">false</bool>
@@ -2441,9 +2235,9 @@ print("[LaserGun] LocalScript loaded.")
 					<string name="Name">NextWaveFrame</string>
 					<int64 name="SourceAssetId">-1</int64>
 					<BinaryString name="Tags"></BinaryString>
-					<UniqueId name="UniqueId">3783a5e21b3f4aae0a44646d00000c28</UniqueId>
+					<UniqueId name="UniqueId">779da0f573a2aa250a44959300002eac</UniqueId>
 				</Properties>
-				<Item class="UICorner" referent="RBXE58078A82BCC41F7BE6703B436A883A9">
+				<Item class="UICorner" referent="RBX9836E9DB62014BE3ADABE42E4223949B">
 					<Properties>
 						<UDim name="BottomLeftRadius">
 							<S>0</S>
@@ -2468,10 +2262,10 @@ print("[LaserGun] LocalScript loaded.")
 						<string name="Name">UICorner</string>
 						<int64 name="SourceAssetId">-1</int64>
 						<BinaryString name="Tags"></BinaryString>
-						<UniqueId name="UniqueId">3783a5e21b3f4aae0a44646d00000c29</UniqueId>
+						<UniqueId name="UniqueId">779da0f573a2aa250a44959300002ead</UniqueId>
 					</Properties>
 				</Item>
-				<Item class="TextLabel" referent="RBX50318E8A43EF432C9CFD59A03CE27779">
+				<Item class="TextLabel" referent="RBX07E8737C29E14B648CD739B43E8EE119">
 					<Properties>
 						<Font name="FontFace">
 							<Family><url>rbxasset://fonts/families/GothamSSm.json</url></Family>
@@ -2566,27 +2360,158 @@ print("[LaserGun] LocalScript loaded.")
 						<string name="Name">NextWaveLabel</string>
 						<int64 name="SourceAssetId">-1</int64>
 						<BinaryString name="Tags"></BinaryString>
-						<UniqueId name="UniqueId">3783a5e21b3f4aae0a44646d00000c2a</UniqueId>
+						<UniqueId name="UniqueId">779da0f573a2aa250a44959300002eae</UniqueId>
 					</Properties>
 				</Item>
 			</Item>
-			<Item class="LocalScript" referent="RBX52E47D5DE3C2481EBD326C17FC4EB70A">
+			<Item class="TextButton" referent="RBX0C3EE5CB8181475E80820264DF1567B1">
 				<Properties>
-					<ProtectedString name="Source"><![CDATA[-- HUDController: Phase 5 + 6 - Wave HUD + Kill Counter + You Died + Spectator
+					<Font name="FontFace">
+						<Family><url>rbxasset://fonts/families/GothamSSm.json</url></Family>
+						<Weight>700</Weight>
+						<Style>Normal</Style>
+						<CachedFaceId><url>rbxasset://fonts/Montserrat-Bold.ttf</url></CachedFaceId>
+					</Font>
+					<float name="LineHeight">1</float>
+					<string name="LocalizationMatchIdentifier"></string>
+					<string name="LocalizationMatchedSourceText"></string>
+					<int name="MaxVisibleGraphemes">-1</int>
+					<string name="OpenTypeFeatures"></string>
+					<bool name="RichText">false</bool>
+					<string name="Text">&#226;&#134;&#186; Respawn</string>
+					<Color3 name="TextColor3">
+						<R>1</R>
+						<G>1</G>
+						<B>1</B>
+					</Color3>
+					<token name="TextDirection">0</token>
+					<bool name="TextScaled">true</bool>
+					<float name="TextSize">8</float>
+					<Color3 name="TextStrokeColor3">
+						<R>0</R>
+						<G>0</G>
+						<B>0</B>
+					</Color3>
+					<float name="TextStrokeTransparency">1</float>
+					<float name="TextTransparency">0</float>
+					<token name="TextTruncate">0</token>
+					<bool name="TextWrapped">true</bool>
+					<token name="TextXAlignment">2</token>
+					<token name="TextYAlignment">1</token>
+					<bool name="AutoButtonColor">true</bool>
+					<Ref name="HoverHapticEffect">null</Ref>
+					<bool name="Modal">false</bool>
+					<Ref name="PressHapticEffect">null</Ref>
+					<bool name="Selected">false</bool>
+					<token name="Style">0</token>
+					<bool name="Active">true</bool>
+					<Vector2 name="AnchorPoint">
+						<X>0</X>
+						<Y>0</Y>
+					</Vector2>
+					<token name="AutomaticSize">0</token>
+					<Color3 name="BackgroundColor3">
+						<R>0.70588237</R>
+						<G>0.117647059</G>
+						<B>0.117647059</B>
+					</Color3>
+					<float name="BackgroundTransparency">0</float>
+					<Color3 name="BorderColor3">
+						<R>0.105882354</R>
+						<G>0.164705887</G>
+						<B>0.20784314</B>
+					</Color3>
+					<token name="BorderMode">0</token>
+					<int name="BorderSizePixel">0</int>
+					<bool name="ClipsDescendants">false</bool>
+					<bool name="Draggable">false</bool>
+					<token name="InputSink">0</token>
+					<bool name="Interactable">true</bool>
+					<int name="LayoutOrder">0</int>
+					<Ref name="NextSelectionDown">null</Ref>
+					<Ref name="NextSelectionLeft">null</Ref>
+					<Ref name="NextSelectionRight">null</Ref>
+					<Ref name="NextSelectionUp">null</Ref>
+					<UDim2 name="Position">
+						<XS>0</XS>
+						<XO>20</XO>
+						<YS>0</YS>
+						<YO>20</YO>
+					</UDim2>
+					<float name="Rotation">0</float>
+					<bool name="Selectable">true</bool>
+					<Ref name="SelectionImageObject">null</Ref>
+					<int name="SelectionOrder">0</int>
+					<UDim2 name="Size">
+						<XS>0</XS>
+						<XO>120</XO>
+						<YS>0</YS>
+						<YO>40</YO>
+					</UDim2>
+					<token name="SizeConstraint">0</token>
+					<bool name="Visible">false</bool>
+					<int name="ZIndex">20</int>
+					<bool name="AutoLocalize">true</bool>
+					<Ref name="RootLocalizationTable">null</Ref>
+					<token name="SelectionBehaviorDown">0</token>
+					<token name="SelectionBehaviorLeft">0</token>
+					<token name="SelectionBehaviorRight">0</token>
+					<token name="SelectionBehaviorUp">0</token>
+					<bool name="SelectionGroup">false</bool>
+					<BinaryString name="AttributesSerialize"></BinaryString>
+					<SecurityCapabilities name="Capabilities">0</SecurityCapabilities>
+					<bool name="DefinesCapabilities">false</bool>
+					<UniqueId name="HistoryId">00000000000000000000000000000000</UniqueId>
+					<string name="Name">RespawnButton</string>
+					<int64 name="SourceAssetId">-1</int64>
+					<BinaryString name="Tags"></BinaryString>
+					<UniqueId name="UniqueId">779da0f573a2aa250a44959300002eaf</UniqueId>
+				</Properties>
+				<Item class="UICorner" referent="RBX5A5DEEC53E7C487EABFBFBFC91DABF50">
+					<Properties>
+						<UDim name="BottomLeftRadius">
+							<S>0</S>
+							<O>8</O>
+						</UDim>
+						<UDim name="BottomRightRadius">
+							<S>0</S>
+							<O>8</O>
+						</UDim>
+						<UDim name="TopLeftRadius">
+							<S>0</S>
+							<O>8</O>
+						</UDim>
+						<UDim name="TopRightRadius">
+							<S>0</S>
+							<O>8</O>
+						</UDim>
+						<BinaryString name="AttributesSerialize"></BinaryString>
+						<SecurityCapabilities name="Capabilities">0</SecurityCapabilities>
+						<bool name="DefinesCapabilities">false</bool>
+						<UniqueId name="HistoryId">00000000000000000000000000000000</UniqueId>
+						<string name="Name">UICorner</string>
+						<int64 name="SourceAssetId">-1</int64>
+						<BinaryString name="Tags"></BinaryString>
+						<UniqueId name="UniqueId">779da0f573a2aa250a44959300002eb0</UniqueId>
+					</Properties>
+				</Item>
+			</Item>
+			<Item class="LocalScript" referent="RBXDEDEB114FF5F45C5B19B357A162708B7">
+				<Properties>
+					<ProtectedString name="Source"><![CDATA[-- HUDController: Phase 5 + 6
 local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
-local TweenService = game:GetService("TweenService")
 
 local player = Players.LocalPlayer
 local gui = player.PlayerGui:WaitForChild("HUD")
 local waveLabel = gui.WaveFrame.WaveLabel
 local killLabel = gui.KillFrame.KillLabel
-local diedFrame = gui.DiedFrame
-local spectatorLabel = gui.DiedFrame.SpectatorLabel
 local nextWaveFrame = gui.NextWaveFrame
+local respawnBtn = gui.RespawnButton
 
 local waveInfo = ReplicatedStorage:WaitForChild("WaveInfo")
 local spectatorEvent = ReplicatedStorage:WaitForChild("SpectatorEvent")
+
 local totalKills = 0
 
 local function setWave(waveNumber: number)
@@ -2604,48 +2529,51 @@ local function addKill()
 	killLabel.Text = string.format("☠ Kills: %d", totalKills)
 end
 
-local function showDied(isSpectating: boolean)
-	diedFrame.Visible = true
-	diedFrame.BackgroundTransparency = 1
-	spectatorLabel.Visible = isSpectating
-	TweenService:Create(
-		diedFrame,
-		TweenInfo.new(0.8, Enum.EasingStyle.Quad, Enum.EasingDirection.Out),
-		{ BackgroundTransparency = 0.5 }
-	):Play()
+-- Just show the respawn button, nothing else
+local function onDied()
+	respawnBtn.Visible = true
+	respawnBtn.Text = "↺ Respawn"
 end
 
-local function hideDied()
-	diedFrame.BackgroundTransparency = 1
-	diedFrame.Visible = false
-	spectatorLabel.Visible = false
+local function onRespawned()
+	respawnBtn.Visible = false
 end
+
+-- Respawn button click
+respawnBtn.MouseButton1Click:Connect(function()
+	respawnBtn.Text = "..."
+	local re = ReplicatedStorage:FindFirstChild("RespawnRequest")
+	if re then
+		re:FireServer()
+	else
+		player:LoadCharacter()
+	end
+end)
 
 waveInfo.OnClientEvent:Connect(function(eventType: string, value: number)
 	if eventType == "Wave" then setWave(value) end
 end)
 
--- Show spectator label when server confirms spectator mode
+-- SpectatorEvent just confirms fly mode started, respawn button already visible
 spectatorEvent.OnClientEvent:Connect(function(action: string)
 	if action == "StartSpectator" then
-		spectatorLabel.Visible = true
+		respawnBtn.Visible = true
 	end
 end)
 
 workspace.ChildRemoved:Connect(function(child)
 	if child.Name == "Enemy" and child:IsA("Model") then
 		local humanoid = child:FindFirstChildOfClass("Humanoid")
-		if humanoid and humanoid.Health <= 0 then
-			addKill()
-		end
+		if humanoid and humanoid.Health <= 0 then addKill() end
 	end
 end)
 
 local function onCharacterAdded(character: Model)
-	hideDied()
+	onRespawned()
 	local humanoid = character:WaitForChild("Humanoid")
 	humanoid.Died:Connect(function()
-		showDied(false) -- spectatorLabel shown separately via SpectatorEvent
+		task.wait(0.5)
+		onDied()
 	end)
 end
 
@@ -2653,102 +2581,11 @@ if player.Character then onCharacterAdded(player.Character) end
 player.CharacterAdded:Connect(onCharacterAdded)
 
 print("[HUDController] Loaded.")
--- HUDController: Phase 5 - Wave HUD + Kill Counter + You Died
-local Players = game:GetService("Players")
-local ReplicatedStorage = game:GetService("ReplicatedStorage")
-local TweenService = game:GetService("TweenService")
-
-local player = Players.LocalPlayer
-local gui = player.PlayerGui:WaitForChild("HUD")
-local waveLabel = gui.WaveFrame.WaveLabel
-local killLabel = gui.KillFrame.KillLabel
-local diedFrame = gui.DiedFrame
-local spectatorLabel = gui.DiedFrame.SpectatorLabel
-local nextWaveFrame = gui.NextWaveFrame
-
-local waveInfo = ReplicatedStorage:WaitForChild("WaveInfo")
-local killsThisWave = 0
-local totalKills = 0
-
--- Update wave label
-local function setWave(waveNumber: number)
-	if waveNumber == 0 then
-		waveLabel.Text = "Wave cleared!"
-		nextWaveFrame.Visible = true
-	else
-		waveLabel.Text = "Wave " .. waveNumber
-		nextWaveFrame.Visible = false
-		killsThisWave = 0
-	end
-end
-
--- Update kill label
-local function addKill()
-	totalKills += 1
-	killsThisWave += 1
-	killLabel.Text = string.format("☠ Kills: %d", totalKills)
-end
-
--- Show You Died screen with fade in
-local function showDied(isSpectating: boolean)
-	diedFrame.Visible = true
-	spectatorLabel.Visible = isSpectating
-	-- Fade background in
-	local tween = TweenService:Create(
-		diedFrame,
-		TweenInfo.new(0.8, Enum.EasingStyle.Quad, Enum.EasingDirection.Out),
-		{ BackgroundTransparency = 0.5 }
-	)
-	tween:Play()
-end
-
--- Hide You Died screen (on respawn)
-local function hideDied()
-	diedFrame.BackgroundTransparency = 1
-	diedFrame.Visible = false
-	spectatorLabel.Visible = false
-end
-
--- Listen for wave broadcasts from WaveManager
-waveInfo.OnClientEvent:Connect(function(eventType: string, value: number)
-	if eventType == "Wave" then
-		setWave(value)
-	end
-end)
-
--- Track enemy kills by watching workspace for Enemy removals
-workspace.ChildRemoved:Connect(function(child)
-	if child.Name == "Enemy" and child:IsA("Model") then
-		local humanoid = child:FindFirstChildOfClass("Humanoid")
-		-- Only count if the enemy actually died (health = 0)
-		if humanoid and humanoid.Health <= 0 then
-			addKill()
-		end
-	end
-end)
-
--- Watch local player death and respawn
-local function onCharacterAdded(character: Model)
-	hideDied()
-	local humanoid = character:WaitForChild("Humanoid")
-	humanoid.Died:Connect(function()
-		-- Check if entering spectator mode (Phase 6 will set this)
-		local isSpectating = character:FindFirstChild("Spectator") ~= nil
-		showDied(isSpectating)
-	end)
-end
-
-if player.Character then
-	onCharacterAdded(player.Character)
-end
-player.CharacterAdded:Connect(onCharacterAdded)
-
-print("[HUDController] Loaded.")
 ]]></ProtectedString>
 					<bool name="Disabled">false</bool>
 					<Content name="LinkedSource"><null></null></Content>
 					<token name="RunContext">0</token>
-					<string name="ScriptGuid">{0ECA55B6-3998-4B45-A1F0-EB5EEB80FF9B}</string>
+					<string name="ScriptGuid">{748C74CC-234D-4A1D-A554-3F610321EE71}</string>
 					<BinaryString name="AttributesSerialize"></BinaryString>
 					<SecurityCapabilities name="Capabilities">0</SecurityCapabilities>
 					<bool name="DefinesCapabilities">false</bool>
@@ -2756,7 +2593,7 @@ print("[HUDController] Loaded.")
 					<string name="Name">LocalScript</string>
 					<int64 name="SourceAssetId">-1</int64>
 					<BinaryString name="Tags"></BinaryString>
-					<UniqueId name="UniqueId">3783a5e21b3f4aae0a44646d00000c2b</UniqueId>
+					<UniqueId name="UniqueId">779da0f573a2aa250a44959300002eb1</UniqueId>
 				</Properties>
 			</Item>
 		</Item>
@@ -3078,6 +2915,30 @@ end
 				<UniqueId name="UniqueId">0855d1c4531d42200a433f2b00000a3f</UniqueId>
 			</Properties>
 		</Item>
+		<Item class="RemoteEvent" referent="RBX349C6FDAB4A5459195334B04533A0674">
+			<Properties>
+				<BinaryString name="AttributesSerialize"></BinaryString>
+				<SecurityCapabilities name="Capabilities">0</SecurityCapabilities>
+				<bool name="DefinesCapabilities">false</bool>
+				<UniqueId name="HistoryId">00000000000000000000000000000000</UniqueId>
+				<string name="Name">RespawnRequest</string>
+				<int64 name="SourceAssetId">-1</int64>
+				<BinaryString name="Tags"></BinaryString>
+				<UniqueId name="UniqueId">779da0f573a2aa250a449593000028e0</UniqueId>
+			</Properties>
+		</Item>
+		<Item class="RemoteEvent" referent="RBX3A476B31807E40E9B1B8EAB18BE67220">
+			<Properties>
+				<BinaryString name="AttributesSerialize"></BinaryString>
+				<SecurityCapabilities name="Capabilities">0</SecurityCapabilities>
+				<bool name="DefinesCapabilities">false</bool>
+				<UniqueId name="HistoryId">00000000000000000000000000000000</UniqueId>
+				<string name="Name">SpectatorEvent</string>
+				<int64 name="SourceAssetId">-1</int64>
+				<BinaryString name="Tags"></BinaryString>
+				<UniqueId name="UniqueId">779da0f573a2aa250a449593000028e1</UniqueId>
+			</Properties>
+		</Item>
 	</Item>
 	<Item class="ServerScriptService" referent="RBX98FAB21C927A4DCE80373D7CC73E9E0E">
 		<Properties>
@@ -3104,7 +2965,116 @@ end
 			</Properties>
 			<Item class="Script" referent="RBXF192930AF8AF46EC93DD27767B671536">
 				<Properties>
-					<ProtectedString name="Source"><![CDATA[-- WaveManager: Phase 1 + 4 - Enemy Spawning & Wave Progression
+					<ProtectedString name="Source"><![CDATA[-- WaveManager: Phase 1 + 4
+local ServerStorage = game:GetService("ServerStorage")
+local Players = game:GetService("Players")
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+
+local WAVE_PAUSE = 5
+local BASE_ENEMIES = 5
+local ENEMIES_PER_WAVE = 3
+local SPAWN_RADIUS = 30
+local WAVE_CLEAR_TIMEOUT = 60
+
+local currentWave = 0
+local waveActive = false
+local activeEnemies = 0
+local waveCleared = Instance.new("BindableEvent")
+
+local waveInfoEvent = ReplicatedStorage:WaitForChild("WaveInfo", 10)
+
+local function broadcastWave(waveNumber: number)
+	if waveInfoEvent then waveInfoEvent:FireAllClients("Wave", waveNumber) end
+end
+
+local function getSpawnPosition(center: Vector3): Vector3
+	local angle = math.random() * 2 * math.pi
+	return Vector3.new(center.X + math.cos(angle) * SPAWN_RADIUS, center.Y + 5, center.Z + math.sin(angle) * SPAWN_RADIUS)
+end
+
+local function getRandomPlayerPosition(): Vector3
+	local positions = {}
+	for _, player in ipairs(Players:GetPlayers()) do
+		if player.Character and player.Character:FindFirstChild("HumanoidRootPart") then
+			table.insert(positions, player.Character.HumanoidRootPart.Position)
+		end
+	end
+	return #positions > 0 and positions[math.random(#positions)] or Vector3.new(0, 5, 0)
+end
+
+local function spawnEnemy(spawnPos: Vector3)
+	local enemyTemplate = ServerStorage:FindFirstChild("EnemyTemplate")
+	if not enemyTemplate then warn("[WaveManager] EnemyTemplate missing!") return end
+	local enemy = enemyTemplate:Clone()
+	enemy.Name = "Enemy"
+	enemy.Parent = workspace
+	if enemy.PrimaryPart then enemy:SetPrimaryPartCFrame(CFrame.new(spawnPos)) end
+	activeEnemies += 1
+	local humanoid = enemy:FindFirstChildOfClass("Humanoid")
+	if humanoid then
+		humanoid.Died:Connect(function()
+			activeEnemies -= 1
+			if activeEnemies <= 0 and waveActive then waveCleared:Fire() end
+		end)
+	end
+end
+
+local function spawnWave(waveNumber: number)
+	local count = BASE_ENEMIES + (waveNumber - 1) * ENEMIES_PER_WAVE
+	print(string.format("[WaveManager] Wave %d — spawning %d enemies", waveNumber, count))
+	activeEnemies = 0
+	for _ = 1, count do
+		spawnEnemy(getSpawnPosition(getRandomPlayerPosition()))
+		task.wait(0.2)
+	end
+end
+
+local function clearEnemies()
+	for _, obj in ipairs(workspace:GetChildren()) do
+		if obj.Name == "Enemy" then obj:Destroy() end
+	end
+	activeEnemies = 0
+end
+
+local function waitForWaveClear()
+	if activeEnemies <= 0 then return end
+	local cleared = false
+	local conn = waveCleared.Event:Connect(function() cleared = true end)
+	local elapsed = 0
+	while not cleared and elapsed < WAVE_CLEAR_TIMEOUT do task.wait(1) elapsed += 1 end
+	conn:Disconnect()
+end
+
+local function livingPlayerCount(): number
+	local count = 0
+	for _, player in ipairs(Players:GetPlayers()) do
+		local char = player.Character
+		if not char then continue end
+		local hum = char:FindFirstChildOfClass("Humanoid")
+		if hum and hum.Health > 0 and not char:FindFirstChild("Spectator") then count += 1 end
+	end
+	return count
+end
+
+task.delay(3, function()
+	while true do
+		repeat task.wait(1) until livingPlayerCount() > 0
+		currentWave += 1
+		waveActive = true
+		print(string.format("[WaveManager] === WAVE %d ===", currentWave))
+		broadcastWave(currentWave)
+		spawnWave(currentWave)
+		waitForWaveClear()
+		waveActive = false
+		clearEnemies()
+		print(string.format("[WaveManager] Wave %d cleared! Next in %ds.", currentWave, WAVE_PAUSE))
+		broadcastWave(0)
+		task.wait(WAVE_PAUSE)
+	end
+end)
+
+print("[WaveManager] Loaded.")
+-- WaveManager: Phase 1 + 4 - Enemy Spawning & Wave Progression
 local ServerStorage = game:GetService("ServerStorage")
 local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
@@ -3289,6 +3259,105 @@ local function explode(enemy: Model)
 		local hum = char:FindFirstChildOfClass("Humanoid")
 		if not hrp or not hum then continue end
 		if char:FindFirstChild("Spectator") then continue end
+		if (hrp.Position - pos).Magnitude <= EXPLOSION_RADIUS then hum:TakeDamage(DAMAGE) end
+	end
+	enemy:Destroy()
+end
+
+local function startChase(enemy: Model)
+	local humanoid = enemy:FindFirstChildOfClass("Humanoid")
+	local root = enemy.PrimaryPart
+	if not humanoid or not root then return end
+	local exploded = false
+	for _, part in ipairs(enemy:GetDescendants()) do
+		if part:IsA("BasePart") then
+			part.Touched:Connect(function(hit)
+				if exploded then return end
+				local char = hit.Parent
+				local player = Players:GetPlayerFromCharacter(char)
+				if not player then return end
+				local hum = char:FindFirstChildOfClass("Humanoid")
+				if not hum or hum.Health <= 0 then return end
+				if char:FindFirstChild("Spectator") then return end
+				exploded = true
+				explode(enemy)
+			end)
+		end
+	end
+	task.spawn(function()
+		while enemy and enemy.Parent and not exploded do
+			local target = getNearestPlayer(root.Position)
+			if target and target.Character then
+				local targetHRP = target.Character:FindFirstChild("HumanoidRootPart")
+				if targetHRP then
+					local path = PathfindingService:CreatePath({ AgentHeight = 5, AgentRadius = 2, AgentCanJump = true })
+					local ok = pcall(function() path:ComputeAsync(root.Position, targetHRP.Position) end)
+					if ok and path.Status == Enum.PathStatus.Success then
+						for _, wp in ipairs(path:GetWaypoints()) do
+							if exploded or not enemy.Parent then break end
+							if wp.Action == Enum.PathWaypointAction.Jump then humanoid.Jump = true end
+							humanoid:MoveTo(wp.Position)
+							humanoid.MoveToFinished:Wait()
+						end
+					else
+						humanoid:MoveTo(targetHRP.Position)
+					end
+				end
+			end
+			task.wait(CHASE_INTERVAL)
+		end
+	end)
+end
+
+workspace.ChildAdded:Connect(function(child)
+	if child.Name == "Enemy" and child:IsA("Model") then
+		task.wait(0.1)
+		startChase(child)
+	end
+end)
+
+print("[EnemyAI] Loaded.")
+-- EnemyAI: Phase 2 - Chase & Explode
+local Players = game:GetService("Players")
+local PathfindingService = game:GetService("PathfindingService")
+
+local DAMAGE = 50
+local EXPLOSION_RADIUS = 8
+local CHASE_INTERVAL = 0.5
+local DETECT_RANGE = 200
+
+local function getNearestPlayer(fromPos: Vector3)
+	local nearest, nearestDist = nil, DETECT_RANGE
+	for _, player in ipairs(Players:GetPlayers()) do
+		local char = player.Character
+		if not char then continue end
+		local hrp = char:FindFirstChild("HumanoidRootPart")
+		local hum = char:FindFirstChildOfClass("Humanoid")
+		if not hrp or not hum or hum.Health <= 0 then continue end
+		if char:FindFirstChild("Spectator") then continue end
+		local dist = (hrp.Position - fromPos).Magnitude
+		if dist < nearestDist then nearest = player nearestDist = dist end
+	end
+	return nearest
+end
+
+local function explode(enemy: Model)
+	local root = enemy.PrimaryPart
+	if not root then return end
+	local pos = root.Position
+	local explosion = Instance.new("Explosion")
+	explosion.Position = pos
+	explosion.BlastRadius = EXPLOSION_RADIUS
+	explosion.BlastPressure = 0
+	explosion.DestroyJointRadiusPercent = 0
+	explosion.Parent = workspace
+	for _, player in ipairs(Players:GetPlayers()) do
+		local char = player.Character
+		if not char then continue end
+		local hrp = char:FindFirstChild("HumanoidRootPart")
+		local hum = char:FindFirstChildOfClass("Humanoid")
+		if not hrp or not hum then continue end
+		if char:FindFirstChild("Spectator") then continue end
 		if (hrp.Position - pos).Magnitude <= EXPLOSION_RADIUS then
 			hum:TakeDamage(DAMAGE)
 		end
@@ -3393,6 +3462,33 @@ end
 
 laserFired.OnServerEvent:Connect(onLaserFired)
 print("[LaserGunServer] Loaded.")
+-- LaserGunServer: Phase 3 - Server Side
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local Players = game:GetService("Players")
+
+local laserFired = ReplicatedStorage:WaitForChild("LaserFired")
+
+local function onLaserFired(player: Player, enemyModel: Model, hitPosition: Vector3)
+	if not player or not player.Character then return end
+	if not enemyModel or not enemyModel:IsA("Model") then return end
+	if enemyModel.Name ~= "Enemy" or not enemyModel.Parent then return end
+	local humanoid = enemyModel:FindFirstChildOfClass("Humanoid")
+	if not humanoid or humanoid.Health <= 0 then return end
+	local hrp = player.Character:FindFirstChild("HumanoidRootPart")
+	local enemyRoot = enemyModel.PrimaryPart
+	if hrp and enemyRoot then
+		if (hrp.Position - enemyRoot.Position).Magnitude > 500 then
+			warn("[LaserGunServer] Suspicious shot from " .. player.Name)
+			return
+		end
+	end
+	humanoid:TakeDamage(50)
+	print(string.format("[LaserGunServer] %s hit enemy — HP: %.0f", player.Name, humanoid.Health))
+	laserFired:FireAllClients(player, hitPosition)
+end
+
+laserFired.OnServerEvent:Connect(onLaserFired)
+print("[LaserGunServer] Loaded.")
 ]]></ProtectedString>
 					<bool name="Disabled">false</bool>
 					<Content name="LinkedSource"><null></null></Content>
@@ -3411,41 +3507,133 @@ print("[LaserGunServer] Loaded.")
 			<Item class="Script" referent="RBXED560E8B177041C0BF14FA72869E6945">
 				<Properties>
 					<ProtectedString name="Source"><![CDATA[-- SpectatorManager: Phase 6 - Spectator Mode
--- When a player dies they become ghost-like, enemies ignore them,
--- and they can fly around and watch the game.
-
 local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 
-local spectatorEvent = Instance.new("RemoteEvent")
-spectatorEvent.Name = "SpectatorEvent"
-spectatorEvent.Parent = ReplicatedStorage
+Players.RespawnTime = 9999
+
+local spectatorEvent = ReplicatedStorage:WaitForChild("SpectatorEvent", 10)
+if not spectatorEvent then
+	spectatorEvent = Instance.new("RemoteEvent")
+	spectatorEvent.Name = "SpectatorEvent"
+	spectatorEvent.Parent = ReplicatedStorage
+end
 
 local function makeSpectator(player: Player)
 	local character = player.Character
 	if not character then return end
 
-	-- Tag the character so EnemyAI and HUD know to ignore them
+	-- Tag so EnemyAI ignores them
 	local tag = Instance.new("BoolValue")
 	tag.Name = "Spectator"
 	tag.Parent = character
 
-	-- Make all parts ghost-like (semi-transparent, no collision)
+	-- Anchor EVERY BasePart so body freezes exactly where it died
+	for _, part in ipairs(character:GetDescendants()) do
+		if part:IsA("BasePart") then
+			part.Anchored = true
+			part.CanCollide = false
+			part.Transparency = 0.7
+		end
+	end
+	-- Also hit the top-level parts directly
+	for _, partName in ipairs({"HumanoidRootPart", "Head", "Torso", "Left Arm", "Right Arm", "Left Leg", "Right Leg"}) do
+		local p = character:FindFirstChild(partName)
+		if p and p:IsA("BasePart") then
+			p.Anchored = true
+			p.CanCollide = false
+			p.Transparency = 0.7
+		end
+	end
+
+	-- Strip weapons
+	for _, item in ipairs(player.Backpack:GetChildren()) do item:Destroy() end
+	local equipped = character:FindFirstChildOfClass("Tool")
+	if equipped then equipped:Destroy() end
+
+	-- Tell client to start fly mode (it will unanchor HRP only)
+	spectatorEvent:FireClient(player, "StartSpectator")
+	print(string.format("[SpectatorManager] %s is now spectating.", player.Name))
+end
+
+local function onCharacterAdded(player: Player, character: Model)
+	local humanoid = character:WaitForChild("Humanoid")
+	humanoid.Died:Connect(function()
+		task.wait(0.1) -- very short wait then freeze immediately
+		makeSpectator(player)
+	end)
+end
+
+Players.PlayerAdded:Connect(function(player)
+	player.CharacterAdded:Connect(function(character)
+		onCharacterAdded(player, character)
+	end)
+	if player.Character then onCharacterAdded(player, player.Character) end
+end)
+
+for _, player in ipairs(Players:GetPlayers()) do
+	if player.Character then onCharacterAdded(player, player.Character) end
+end
+
+print("[SpectatorManager] Loaded.")
+-- SpectatorManager: Phase 6 - Spectator Mode
+local Players = game:GetService("Players")
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+
+-- Disable auto-respawn so dead players stay as spectators until round reset
+Players.RespawnTime = 9999
+
+local spectatorEvent = ReplicatedStorage:WaitForChild("SpectatorEvent", 10)
+if not spectatorEvent then
+	spectatorEvent = Instance.new("RemoteEvent")
+	spectatorEvent.Name = "SpectatorEvent"
+	spectatorEvent.Parent = ReplicatedStorage
+end
+
+local function makeSpectator(player: Player)
+	local character = player.Character
+	if not character then return end
+
+	-- Tag first so EnemyAI ignores them immediately
+	local tag = Instance.new("BoolValue")
+	tag.Name = "Spectator"
+	tag.Parent = character
+
+	-- Anchor HRP immediately so they don't fall
+	local hrp = character:FindFirstChild("HumanoidRootPart")
+	if hrp then hrp.Anchored = true end
+
+	-- Wait a moment for death ragdoll to settle, then apply ghost
+	task.wait(0.3)
+
+	-- Re-grab character in case it changed
+	character = player.Character
+	if not character then return end
+
+	-- Make all parts ghost-like (skip HumanoidRootPart which stays anchored)
 	for _, part in ipairs(character:GetDescendants()) do
 		if part:IsA("BasePart") then
 			part.Transparency = 0.7
 			part.CanCollide = false
 		end
 	end
+	-- Also ghost the main parts directly
+	for _, partName in ipairs({"Head", "Torso", "Left Arm", "Right Arm", "Left Leg", "Right Leg", "HumanoidRootPart"}) do
+		local p = character:FindFirstChild(partName)
+		if p and p:IsA("BasePart") then
+			p.Transparency = 0.7
+			p.CanCollide = false
+		end
+	end
 
-	-- Remove tools so spectators can't shoot
+	-- Strip weapons
 	for _, item in ipairs(player.Backpack:GetChildren()) do
 		item:Destroy()
 	end
 	local equipped = character:FindFirstChildOfClass("Tool")
 	if equipped then equipped:Destroy() end
 
-	-- Give the character a BodyVelocity-based fly ability via client
+	-- Tell client to start fly mode
 	spectatorEvent:FireClient(player, "StartSpectator")
 
 	print(string.format("[SpectatorManager] %s is now spectating.", player.Name))
@@ -3454,7 +3642,7 @@ end
 local function onCharacterAdded(player: Player, character: Model)
 	local humanoid = character:WaitForChild("Humanoid")
 	humanoid.Died:Connect(function()
-		task.wait(1) -- brief pause so death animation plays
+		task.wait(0.5) -- short pause for death animation then freeze them
 		makeSpectator(player)
 	end)
 end
@@ -3488,6 +3676,39 @@ print("[SpectatorManager] Loaded.")
 					<int64 name="SourceAssetId">-1</int64>
 					<BinaryString name="Tags"></BinaryString>
 					<UniqueId name="UniqueId">3783a5e21b3f4aae0a44646d00000fde</UniqueId>
+				</Properties>
+			</Item>
+			<Item class="Script" referent="RBX12E87447CDC44FC287072282C1B96DA1">
+				<Properties>
+					<ProtectedString name="Source"><![CDATA[-- RespawnHandler: handles manual respawn requests from the respawn button
+local Players = game:GetService("Players")
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+
+local respawnRequest = ReplicatedStorage:WaitForChild("RespawnRequest")
+
+respawnRequest.OnServerEvent:Connect(function(player: Player)
+	-- Reset respawn time temporarily so LoadCharacter works
+	local prev = Players.RespawnTime
+	Players.RespawnTime = 0
+	player:LoadCharacter()
+	Players.RespawnTime = prev
+	print(string.format("[RespawnHandler] %s manually respawned.", player.Name))
+end)
+
+print("[RespawnHandler] Loaded.")
+]]></ProtectedString>
+					<bool name="Disabled">false</bool>
+					<Content name="LinkedSource"><null></null></Content>
+					<token name="RunContext">0</token>
+					<string name="ScriptGuid">{73E946B4-8DAE-4754-8CBE-00756FBC7AD6}</string>
+					<BinaryString name="AttributesSerialize"></BinaryString>
+					<SecurityCapabilities name="Capabilities">0</SecurityCapabilities>
+					<bool name="DefinesCapabilities">false</bool>
+					<UniqueId name="HistoryId">00000000000000000000000000000000</UniqueId>
+					<string name="Name">RespawnHandler</string>
+					<int64 name="SourceAssetId">-1</int64>
+					<BinaryString name="Tags"></BinaryString>
+					<UniqueId name="UniqueId">779da0f573a2aa250a449593000028e2</UniqueId>
 				</Properties>
 			</Item>
 		</Item>
