@@ -83,6 +83,21 @@ end
 makeBar(UDim2.fromOffset(28, 3)) -- horizontal
 makeBar(UDim2.fromOffset(3, 28)) -- vertical
 
+-- Welcome banner — greet the player by name with their personal Roblox UserId on
+-- join, then fade it out. (Read locally here; the server's PlayerRegistry hook is
+-- what records every user's id centrally.)
+local welcome = makeLabel("Welcome", Vector2.new(0.5, 0), UDim2.fromScale(0.5, 0.16), UDim2.fromScale(0.7, 0.06), 24)
+welcome.TextColor3 = Color3.fromRGB(130, 235, 255)
+welcome.Text = string.format("Welcome, %s!   ·   ID %d", player.DisplayName, player.UserId)
+task.delay(6, function()
+	for a = 0, 1, 0.08 do
+		welcome.TextTransparency = a
+		welcome.TextStrokeTransparency = math.clamp(0.4 + a, 0, 1)
+		task.wait(0.04)
+	end
+	welcome.Visible = false
+end)
+
 -- Wave / kill / game-over updates from the server.
 local waveInfo = ReplicatedStorage:WaitForChild("WaveInfo")
 waveInfo.OnClientEvent:Connect(function(kind, value)

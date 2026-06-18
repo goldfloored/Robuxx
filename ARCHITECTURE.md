@@ -14,6 +14,10 @@
 
 **Lesson learned (the HUD regression):** Anything that lives *only* in Studio (StarterGui/StarterPack via MCP) is not in Git, so a place revert wipes it with no way to restore. **Prefer building UI in the synced client script (in code) so it's version-controlled.** The HUD is now built this way.
 
+## Player onboarding (welcome + user tracking)
+- **`src/server/PlayerRegistry.server.luau`** — a **single** `Players.PlayerAdded` hook that records every joining user (`UserId → {name, displayName, joinedAt}`) into one table, prints each join, and exposes the whole list via `_G.GetRegisteredUsers()`. This is the one place to read the server's entire player base. (If you ever see `[PlayerRegistry] Loaded.` print twice, a duplicate snuck in — delete the extra.)
+- **Welcome banner** (in `src/client/init.client.luau`) — on join, greets the player with `Welcome, <DisplayName>! · ID <UserId>` (read locally from `LocalPlayer`), then fades out after 6 s.
+
 ## Replicated objects (the contract between server & client)
 
 | Name | Type | Created by | Direction | Payload |
