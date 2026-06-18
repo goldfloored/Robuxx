@@ -61,7 +61,7 @@ local function newPart(shape, size, cframe, color, parent)
 	p.Material = Enum.Material.SmoothPlastic   -- no realistic noise
 	p.Anchored = true
 	p.CanCollide = true
-	p.CastShadow = true
+	p.CastShadow = false   -- shadows off for now (they were noisy/buggy on the palms)
 	p.TopSurface = Enum.SurfaceType.Smooth
 	p.BottomSurface = Enum.SurfaceType.Smooth
 	p.Parent = parent
@@ -97,6 +97,29 @@ local function placeFlush(model, x, z, spin, groundY)
 	model:PivotTo(CFrame.new(x, 0, z) * CFrame.Angles(0, spin, 0) * model:GetPivot().Rotation)
 	local cf, size = model:GetBoundingBox()
 	model:PivotTo(model:GetPivot() + Vector3.new(0, groundY - worldMinY(cf, size), 0))
+end
+
+-- Make a placed palm touchable & climbable WITHOUT a canopy-wide wall: a slim
+-- TrussPart up the trunk (solid so you bump it / climb it with W) and a small cap
+-- at the crown to stand on. The visual union stays non-colliding, so the only
+-- colliders are at the trunk + a tiny crown cap — never an empty-space wall.
+-- Sized to the placed model, so call AFTER placeFlush.
+local function addClimbStructure(model)
+	local cf, size = model:GetBoundingBox()
+	local bottom = cf.Y - size.Y / 2
+	local th = size.Y * 0.9
+	local truss = Instance.new("TrussPart")
+	truss.Name = "ClimbTruss"
+	truss.Size = Vector3.new(2, th, 2)
+	truss.Anchored = true; truss.CanCollide = true; truss.Transparency = 1; truss.CastShadow = false
+	truss.CFrame = CFrame.new(cf.X, bottom + th / 2, cf.Z)
+	truss.Parent = model
+	local cap = Instance.new("Part")
+	cap.Name = "TopCap"
+	cap.Size = Vector3.new(3, 1, 3)
+	cap.Anchored = true; cap.CanCollide = true; cap.Transparency = 1; cap.CastShadow = false
+	cap.CFrame = CFrame.new(cf.X, bottom + th, cf.Z)
+	cap.Parent = model
 end
 
 -- ──────────────────────────── Palm tree ───────────────────────────
@@ -170,7 +193,12 @@ function BeachEnvironment.bakePalm(opts)
 			union.Name = "PalmMesh"
 			union.UsePartColor = false             -- keep each part's original colour
 			union.Anchored = true
-			union.CanCollide = true
+			union.CastShadow = false               -- shadows off for now
+			-- The visual mesh is always non-colliding: a Union's collider is its
+			-- bounding BOX (canopy-wide) = invisible walls. Touch/climb collision is
+			-- provided by the slim trunk truss + crown cap added in plantPalms, so the
+			-- only solid bits sit on the visible trunk, never in empty space.
+			union.CanCollide = false
 			local wrapper = Instance.new("Model")
 			wrapper.Name = "Palm"
 			union.Parent = wrapper
@@ -196,6 +224,7 @@ function BeachEnvironment.plantPalms(opts)
 	local minH, maxH = opts.minHeight or 20, opts.maxHeight or 46
 	local centre = opts.center or Vector3.zero
 	local groundY = opts.groundY or 0
+	local walkable = opts.walkable == true   -- default false: solid trunk + climb-truss + top cap
 
 	local template = opts.template or BeachEnvironment.bakePalm(opts)
 	local _, baseSize = template:GetBoundingBox()
@@ -214,8 +243,12 @@ function BeachEnvironment.plantPalms(opts)
 		local scale = (minH + math.random() * (maxH - minH)) / baseHeight
 		local clone = template:Clone()
 		clone:ScaleTo(scale)
+		for _, d in ipairs(clone:GetDescendants()) do
+			if d:IsA("BasePart") then d.CanCollide = false; d.CastShadow = false end
+		end
 		placeFlush(clone, x, z, math.random() * math.pi * 2, groundY)
 		clone.Parent = folder
+		if not walkable then addClimbStructure(clone) end   -- touchable + climbable
 	end
 
 	if opts.keepTemplate then template.Parent = opts.parent or workspace end
