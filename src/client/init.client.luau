@@ -44,15 +44,21 @@ killLabel.TextXAlignment = Enum.TextXAlignment.Right
 killLabel.Text = "Kills: 0"
 
 -- "You Died" overlay, center, hidden until death.
-local diedLabel = makeLabel("YouDied", Vector2.new(0.5, 0.5), UDim2.fromScale(0.5, 0.5), UDim2.fromScale(0.8, 0.2), 56)
+local diedLabel = makeLabel("YouDied", Vector2.new(0.5, 0.5), UDim2.fromScale(0.5, 0.42), UDim2.fromScale(0.8, 0.2), 56)
 diedLabel.TextColor3 = Color3.fromRGB(255, 60, 60)
 diedLabel.Text = "YOU DIED"
 diedLabel.Visible = false
 
--- Wave / kill updates from the server.
+-- Winner / restart banner (Phase 7), center, hidden until the party wipes.
+local gameOverLabel = makeLabel("GameOver", Vector2.new(0.5, 0.5), UDim2.fromScale(0.5, 0.58), UDim2.fromScale(0.9, 0.18), 36)
+gameOverLabel.TextColor3 = Color3.fromRGB(255, 215, 0)
+gameOverLabel.Visible = false
+
+-- Wave / kill / game-over updates from the server.
 local waveInfo = ReplicatedStorage:WaitForChild("WaveInfo")
 waveInfo.OnClientEvent:Connect(function(kind, value)
 	if kind == "Wave" then
+		gameOverLabel.Visible = false -- new round/wave starting
 		if value and value > 0 then
 			waveLabel.Text = "Wave " .. value
 		else
@@ -60,12 +66,16 @@ waveInfo.OnClientEvent:Connect(function(kind, value)
 		end
 	elseif kind == "Kill" then
 		killLabel.Text = "Kills: " .. tostring(value or 0)
+	elseif kind == "GameOver" then
+		gameOverLabel.Text = string.format("🏆 %s survived the longest!\nRestarting...", tostring(value))
+		gameOverLabel.Visible = true
 	end
 end)
 
--- Show "You Died" on death, hide it on respawn.
+-- Show "You Died" on death, hide overlays on respawn.
 local function onCharacter(char: Model)
 	diedLabel.Visible = false
+	gameOverLabel.Visible = false
 	local humanoid = char:WaitForChild("Humanoid")
 	humanoid.Died:Connect(function()
 		diedLabel.Visible = true

@@ -56,9 +56,20 @@
 - Listens to `WaveInfo`: `"Wave"` → updates wave label (`0` → "Get Ready…"); `"Kill"` → updates kill label.
 - `onCharacter(char)` — hides the "You Died" overlay on spawn, shows it on `Humanoid.Died`.
 
-## Phase 7 — Spectator mode & restart ❌ (next)
-Not yet built. Needs: set a `Spectator` tag on dead players (the AI/spawn code already *reads* this tag), ghost appearance via `Highlight`/transparency, last-survivor winner announcement to all clients, restart from wave 1.
+## Phase 7 — Spectator mode & restart 🔄 (current)
+Built cleanly in Rojo. Round-based: `WaveManager` sets `Players.CharacterAutoLoads = false` and owns all (re)spawning.
+**File:** `src/server/SpectatorManager.server.luau`
+- `makeGhost(player, char)` — on `Humanoid.Died`: adds the `Spectator` tag, sets body parts to `GHOST_TRANSPARENCY` + `CanCollide=false`, strips their Tool. Enemies already ignore tagged/dead players (EnemyAI), so no AI change needed.
 
-> **Cleanup note (2026-06-18):** An earlier MCP attempt left an orphaned spectator/respawn system baked into `WaveSurvival.rbxlx` (NOT in Rojo): `SpectatorManager` + `RespawnHandler` (ServerScriptService.Server), `SpectatorClient` (nested in StarterPlayerScripts.Client), `RespawnButton` (StarterGui), and `RespawnRequest` + `SpectatorEvent` RemoteEvents. `SpectatorManager` had its source pasted twice (double Died handlers, `RespawnTime=9999` set twice). **Decision: purge all 6 in Studio**, rebuild Phase 7 cleanly inside Rojo `src/`. The `FindFirstChild("Spectator")` checks in `src/server` are intentional Phase 7 hooks — keep them.
+**File:** `src/server/WaveManager.server.luau` (round lifecycle)
+- `onPlayer/onCharacter` — `LoadCharacter()` on join; records `lastDeadPlayer` (last to fall = winner) via `Humanoid.Died`.
+- `waitForWaveEnd()` — returns when enemies cleared, **party wiped** (`livingPlayerCount()==0`), or timeout.
+- `restartRound()` — clears enemies, resets `currentWave=0`, `LoadCharacter()`s everyone (fresh body drops ghost/tag), broadcasts `Wave 0`.
+- Main loop: on wipe → `broadcast("GameOver", winnerName)` → wait `RESTART_DELAY` → `restartRound()`.
+- **Bug fixed:** enemy count now decremented on `enemy.Destroying` (covers both laser-kills and enemies that explode), instead of only `Humanoid.Died` — previously exploded enemies could hang a wave until the 60s timeout.
+
+**File:** `src/client/init.client.luau` — adds a gold "🏆 \<name\> survived the longest! Restarting…" banner on `WaveInfo` `"GameOver"`; cleared on the next `"Wave"` message or respawn.
+
+> **Cleanup done (2026-06-18):** Purged the orphaned MCP spectator/respawn system from `WaveSurvival.rbxlx` (`SpectatorManager`+`RespawnHandler`, nested `SpectatorClient`, `RespawnButton`, `RespawnRequest`+`SpectatorEvent` RemoteEvents — the old `SpectatorManager` had its source pasted twice and set `RespawnTime=9999`). Replaced with the clean Rojo version above.
 </content>
 </invoke>

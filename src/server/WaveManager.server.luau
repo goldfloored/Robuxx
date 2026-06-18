@@ -1,4 +1,4 @@
--- WaveManager: Phase 1 + 4 - Enemy Spawning & Wave Progression
+-- WaveManager: Phases 2/5 + 7 — Enemy spawning, wave progression, round lifecycle.
 local ServerStorage = game:GetService("ServerStorage")
 local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
@@ -8,11 +8,16 @@ local BASE_ENEMIES = 5
 local ENEMIES_PER_WAVE = 3
 local SPAWN_RADIUS = 30
 local WAVE_CLEAR_TIMEOUT = 60
+local RESTART_DELAY = 6
 
 local currentWave = 0
 local waveActive = false
 local activeEnemies = 0
-local waveCleared = Instance.new("BindableEvent")
+local lastDeadPlayer: Player? = nil
+
+-- Round-based: we own spawning so dead players stay spectators until the whole
+-- party wipes, then everyone respawns for a fresh round (Phase 7).
+Players.CharacterAutoLoads = false
 
 local waveInfoEvent = ReplicatedStorage:FindFirstChild("WaveInfo")
 if not waveInfoEvent then
@@ -21,8 +26,8 @@ if not waveInfoEvent then
 	waveInfoEvent.Parent = ReplicatedStorage
 end
 
-local function broadcastWave(waveNumber: number)
-	waveInfoEvent:FireAllClients("Wave", waveNumber)
+local function broadcast(kind: string, value: any)
+	waveInfoEvent:FireAllClients(kind, value)
 end
 
 local function getSpawnPosition(center: Vector3): Vector3
@@ -57,13 +62,17 @@ local function spawnEnemy(spawnPos: Vector3)
 		enemy:SetPrimaryPartCFrame(CFrame.new(spawnPos))
 	end
 	activeEnemies += 1
+	-- Single decrement path: covers laser-kills AND enemies that explode on a
+	-- player (both end in Destroy), so the wave can't hang waiting on a corpse.
+	enemy.Destroying:Connect(function()
+		activeEnemies -= 1
+	end)
 	local humanoid = enemy:FindFirstChildOfClass("Humanoid")
 	if humanoid then
 		humanoid.Died:Connect(function()
-			activeEnemies -= 1
-			if activeEnemies <= 0 and waveActive then
-				waveCleared:Fire()
-			end
+			task.delay(0.3, function()
+				if enemy.Parent then enemy:Destroy() end
+			end)
 		end)
 	end
 end
@@ -71,7 +80,6 @@ end
 local function spawnWave(waveNumber: number)
 	local count = BASE_ENEMIES + (waveNumber - 1) * ENEMIES_PER_WAVE
 	print(string.format("[WaveManager] Wave %d — spawning %d enemies", waveNumber, count))
-	activeEnemies = 0
 	for _ = 1, count do
 		spawnEnemy(getSpawnPosition(getRandomPlayerPosition()))
 		task.wait(0.2)
@@ -83,21 +91,6 @@ local function clearEnemies()
 		if obj.Name == "Enemy" then obj:Destroy() end
 	end
 	activeEnemies = 0
-end
-
-local function waitForWaveClear()
-	if activeEnemies <= 0 then return end
-	local cleared = false
-	local conn = waveCleared.Event:Connect(function() cleared = true end)
-	local elapsed = 0
-	while not cleared and elapsed < WAVE_CLEAR_TIMEOUT do
-		task.wait(1)
-		elapsed += 1
-	end
-	conn:Disconnect()
-	if not cleared then
-		warn(string.format("[WaveManager] Wave %d timed out", currentWave))
-	end
 end
 
 local function livingPlayerCount(): number
@@ -113,20 +106,72 @@ local function livingPlayerCount(): number
 	return count
 end
 
+-- Remember the last player to fall — that's the "last survivor" / winner.
+local function onCharacter(player: Player, character: Model)
+	local humanoid = character:WaitForChild("Humanoid")
+	humanoid.Died:Connect(function()
+		lastDeadPlayer = player
+	end)
+end
+
+local function onPlayer(player: Player)
+	player.CharacterAdded:Connect(function(character)
+		onCharacter(player, character)
+	end)
+	player:LoadCharacter()
+end
+
+Players.PlayerAdded:Connect(onPlayer)
+for _, player in ipairs(Players:GetPlayers()) do
+	onPlayer(player)
+end
+
+-- Wait until the wave ends: enemies cleared, party wiped, or safety timeout.
+local function waitForWaveEnd()
+	local elapsed = 0
+	while elapsed < WAVE_CLEAR_TIMEOUT do
+		if activeEnemies <= 0 then return end
+		if livingPlayerCount() == 0 then return end
+		task.wait(0.5)
+		elapsed += 0.5
+	end
+	warn(string.format("[WaveManager] Wave %d timed out", currentWave))
+end
+
+local function restartRound()
+	clearEnemies()
+	currentWave = 0
+	lastDeadPlayer = nil
+	for _, player in ipairs(Players:GetPlayers()) do
+		player:LoadCharacter() -- fresh body clears the ghost + Spectator tag
+	end
+	task.wait(1)
+	broadcast("Wave", 0)
+end
+
 task.delay(3, function()
 	while true do
 		repeat task.wait(1) until livingPlayerCount() > 0
 		currentWave += 1
 		waveActive = true
 		print(string.format("[WaveManager] === WAVE %d ===", currentWave))
-		broadcastWave(currentWave)
+		broadcast("Wave", currentWave)
 		spawnWave(currentWave)
-		waitForWaveClear()
+		waitForWaveEnd()
 		waveActive = false
 		clearEnemies()
-		print(string.format("[WaveManager] Wave %d cleared! Next in %ds.", currentWave, WAVE_PAUSE))
-		broadcastWave(0)
-		task.wait(WAVE_PAUSE)
+
+		if livingPlayerCount() == 0 then
+			local winnerName = (lastDeadPlayer and lastDeadPlayer.Parent) and lastDeadPlayer.Name or "Nobody"
+			print(string.format("[WaveManager] Party wiped on wave %d. Winner: %s", currentWave, winnerName))
+			broadcast("GameOver", winnerName)
+			task.wait(RESTART_DELAY)
+			restartRound()
+		else
+			print(string.format("[WaveManager] Wave %d cleared! Next in %ds.", currentWave, WAVE_PAUSE))
+			broadcast("Wave", 0)
+			task.wait(WAVE_PAUSE)
+		end
 	end
 end)
 
