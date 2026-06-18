@@ -23,14 +23,6 @@
       }
     },
 
-    "StarterPack": {
-      "$path": "src/starterpack"
-    },
-
-    "StarterGui": {
-      "$path": "src/startergui"
-    },
-
     "Workspace": {
       "$properties": {
         "FilteringEnabled": true
