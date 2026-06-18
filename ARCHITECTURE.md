@@ -75,5 +75,18 @@ Built cleanly in Rojo. Round-based: `WaveManager` sets `Players.CharacterAutoLoa
 > **Performance fix (2026-06-18) — duplicate scripts were running every system 2–3×:** The place held a *stale legacy* `ServerScriptService.Server` **Folder** (old pre-Rojo monolithic scripts: `WaveManager "Phase 1+4"`, `EnemyAI`, `LaserGunServer`, `SpectatorManager "Phase 6"`, + orphan `RespawnHandler`) sitting **alongside** the real Rojo `Server` **Script** (`init.server.luau`, which holds the current scripts as children). Both ran at once → multiple concurrent wave loops, doubled `LoadCharacter()` (slow/janky spawns), doubled `PathfindingService:ComputeAsync` per enemy (lag). Also a broken duplicate `StarterPack.LaserGun` **Folder** (Rojo's incomplete `init.tool.json` repr — `Handle` was a Folder, not equippable) next to the working `LaserGun` **Tool**, and the dead `RespawnRequest`/`SpectatorEvent` RemoteEvents. **Fix:** deleted the stale Folder, the broken LaserGun Folder, and the dead RemoteEvents from the place; removed the `StarterPack`/`StarterGui` mappings from `default.project.json` (both are Studio-only per the table above — the mappings made Rojo recreate the broken LaserGun and pointed at a non-existent `src/startergui`); deleted the orphaned `src/starterpack/` files. Verified: a fresh play test now logs exactly one `Loaded.` per system and a single `=== WAVE 1 ===`.
 >
 > **How to detect a recurrence:** in Studio, `ServerScriptService` should contain exactly **one** child named `Server` (a *Script*, not a Folder). If you see two, or any `Loaded.` line printing more than once at startup, a stale duplicate is back.
+
+---
+
+## Environment tooling — `BeachEnvironment` (not part of the wave gameplay)
+**File:** `src/shared/BeachEnvironment.luau` → `ReplicatedStorage.Shared.BeachEnvironment` (ModuleScript)
+
+Procedurally builds **low-poly tropical beach assets** in the project's stylized cartoon look: curving segmented cylinder palm trunks, starburst flat-blade fronds (two-tone green), cream `SmoothPlastic` sand plates, vibrant grass turf panels. All parts `Anchored`, `CanCollide = true`, flat materials.
+
+- **Memory optimization — "build once, clone many":** geometry is built from primitive parts a single time, baked into **one `Union`** (`UsePartColor=false` keeps colors, `RenderFidelity=Performance`), wrapped in a Model template, then `:Clone()` + `:ScaleTo()` per placed copy. A 40-palm forest is ~40 instances, not 40×~100 parts.
+- `createPalm(opts)` — palm as a raw part Model. `bakePalm(opts)` — returns the baked single-Union template.
+- `plantPalms{count,minRadius,maxRadius,minHeight,maxHeight,...}` — bakes one template and scatters random-sized clones on a ring, leaving the centre open/walkable. `placeFlush()` grounds each by its true bounding box (base flush, no tilt).
+- `createSand(opts)`, `createGrassPatch(opts)`, `generateTestScene(opts)`.
+- **Run it (manual, not auto):** `require(game.ReplicatedStorage.Shared.BeachEnvironment).generateTestScene()` then `workspace.BeachEnv:Destroy()` to clear. Nothing auto-runs this.
 </content>
 </invoke>
